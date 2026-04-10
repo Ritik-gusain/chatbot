@@ -1,7 +1,9 @@
 import streamlit as st
 from bytez import Bytez
 import os
+import json
 import time
+from datetime import datetime
 
 # Configure page
 st.set_page_config(
@@ -10,6 +12,22 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Persistence Helpers
+HISTORY_FILE = "chat_history.json"
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_history(history):
+    with open(HISTORY_FILE, "w") as f:
+        json.dump(history, f, indent=2)
 
 # Custom CSS for premium design
 st.markdown("""
@@ -145,28 +163,9 @@ h2, h3 {
     }
 }
 
-@keyframes pulse-glow {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(189, 194, 255, 0.3);
-    }
-    50% {
-        box-shadow: 0 0 40px rgba(189, 194, 255, 0.6);
-    }
-}
-
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(189, 194, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: #bdc2ff;
-    animation: spin 1s linear infinite;
 }
 
 /* Input styling */
@@ -181,11 +180,6 @@ h2, h3 {
     border: 1px solid rgba(70, 69, 84, 0.3) !important;
     border-radius: 1rem !important;
     color: #e4e1ed !important;
-}
-
-.stChatInput:focus {
-    background: rgba(52, 52, 61, 0.9) !important;
-    box-shadow: 0 0 20px rgba(125, 135, 243, 0.2) !important;
 }
 
 /* Buttons */
@@ -209,67 +203,6 @@ h2, h3 {
     background: #1b1b23;
 }
 
-.stSidebar [data-testid="stMarkdownContainer"] {
-    padding: 0;
-}
-
-/* Tab styling */
-[data-testid="stTabs"] {
-    background: transparent;
-}
-
-.stTabs [data-testid="stTabBar"] {
-    background: transparent;
-    border-bottom: 1px solid rgba(70, 69, 84, 0.2);
-}
-
-.stTabs [aria-selected="true"] {
-    border-bottom: 2px solid #bdc2ff !important;
-}
-
-/* Expander styling */
-[data-testid="stExpander"] {
-    background: #1f1f27;
-    border: 1px solid rgba(70, 69, 84, 0.2);
-    border-radius: 0.75rem;
-}
-
-/* Text input styling */
-.stTextInput > div > div > input {
-    background: #1f1f27 !important;
-    color: #e4e1ed !important;
-    border: 1px solid rgba(70, 69, 84, 0.2) !important;
-    border-radius: 0.5rem !important;
-}
-
-.stTextArea > div > div > textarea {
-    background: #1f1f27 !important;
-    color: #e4e1ed !important;
-    border: 1px solid rgba(70, 69, 84, 0.2) !important;
-    border-radius: 0.5rem !important;
-}
-
-/* Selectbox styling */
-.stSelectbox {
-    background: transparent !important;
-}
-
-.stSelectbox select {
-    background: #1f1f27 !important;
-    color: #e4e1ed !important;
-    border: 1px solid rgba(70, 69, 84, 0.2) !important;
-    border-radius: 0.5rem !important;
-}
-
-/* Slider styling */
-.stSlider {
-    padding: 1rem 0;
-}
-
-.stSlider > div > div > div {
-    color: #bdc2ff;
-}
-
 /* Info/Error boxes */
 [data-testid="stAlert"] {
     background: rgba(125, 135, 243, 0.1) !important;
@@ -278,148 +211,105 @@ h2, h3 {
     color: #e4e1ed !important;
 }
 
-/* Metric styling */
-[data-testid="metric-container"] {
-    background: #1f1f27;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(70, 69, 84, 0.2);
-    padding: 1.5rem;
-}
-
 </style>
 """, unsafe_allow_html=True)
+
+# Initialize Session State
+if "history" not in st.session_state:
+    st.session_state.history = load_history()
+
+if "current_chat_id" not in st.session_state:
+    if st.session_state.history:
+        st.session_state.current_chat_id = st.session_state.history[0]["id"]
+    else:
+        st.session_state.current_chat_id = None
+
+# Helper to get current messages
+def get_current_chat():
+    for chat in st.session_state.history:
+        if chat["id"] == st.session_state.current_chat_id:
+            return chat
+    return None
+
+current_chat = get_current_chat()
+messages = current_chat["messages"] if current_chat else []
 
 # Header section
 col1, col2, col3 = st.columns([1, 3, 1])
 with col1:
     st.markdown("### ✨ The Luminescent Scholar")
     st.caption("POWERED BY BYTEZ AI")
-with col3:
-    st.write("")  # Spacer
 
+# Load Bytez API key
+KEY_FILE = os.path.join("keys", "bytez_api_key.txt")
+bytez_api_key = "510034cf57f565ca955e871952bf486d" # Default key provided
 
-# Load Bytez API key from file
-key_file = os.path.join("keys", "bytez_api_key.txt")
-if os.path.exists(key_file):
-    with open(key_file, "r") as f:
-        bytez_api_key = f.read().strip()
-    if not bytez_api_key or bytez_api_key.startswith("#") or bytez_api_key == "YOUR_BYTEZ_API_KEY_HERE":
-        st.error("⚠️ Please set your valid Bytez API key in keys/bytez_api_key.txt")
-        st.stop()
-else:
-    st.error("⚠️ API key file not found. Please create keys/bytez_api_key.txt with your Bytez API key.")
-    st.stop()
+if os.path.exists(KEY_FILE):
+    with open(KEY_FILE, "r") as f:
+        file_key = f.read().strip()
+        if file_key and not file_key.startswith("#"):
+            bytez_api_key = file_key
 
-# Initialize Bytez SDK
 sdk = Bytez(bytez_api_key)
 model = sdk.model("google/gemma-4-26B-A4B-it")
-
-# Create session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "is_loading" not in st.session_state:
-    st.session_state.is_loading = False
 
 # Sidebar - Settings & Management
 with st.sidebar:
     st.markdown("### ⚙️ Chatbot Settings")
     
-    with st.expander("📝 System Prompt", expanded=True):
+    with st.expander("📝 System Prompt", expanded=False):
         system_prompt = st.text_area(
             "Customize AI behavior:",
-            value="You are a helpful and advanced AI assistant powered by Gemma 4. Provide clear, concise, and intelligent responses.",
+            value="You are Scholar, an advanced and highly capable AI assistant. You are thoughtful, knowledgeable, clear, and friendly. Always give complete, well-structured answers using Markdown. Be conversational but precise.",
             height=100,
             key="system_prompt"
         )
     
-    with st.expander("🎯 Model Configuration"):
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("**Model**")
-            st.info("google/gemma-4-26B-A4B-it")
-        with col2:
-            st.markdown("**Status**")
-            st.success("✅ Active")
-    
     st.markdown("---")
+    st.markdown("### 📚 Conversations")
     
-    with st.expander("💬 Chat Management", expanded=True):
-        col1, col2 = st.columns(2)
+    if st.button("➕ New Chat", use_container_width=True):
+        new_id = str(int(time.time()))
+        st.session_state.history.insert(0, {
+            "id": new_id,
+            "title": f"New Conversation {datetime.now().strftime('%H:%M')}",
+            "messages": [],
+            "timestamp": datetime.now().isoformat()
+        })
+        st.session_state.current_chat_id = new_id
+        save_history(st.session_state.history)
+        st.rerun()
+
+    for i, chat in enumerate(st.session_state.history):
+        col1, col2 = st.columns([4, 1])
         with col1:
-            if st.button("🗑️ Clear Chat", use_container_width=True):
-                st.session_state.messages = []
-                st.success("Chat cleared!")
+            active = " (Active)" if chat["id"] == st.session_state.current_chat_id else ""
+            if st.button(f"💬 {chat['title']}{active}", key=f"chat_{chat['id']}", use_container_width=True):
+                st.session_state.current_chat_id = chat["id"]
                 st.rerun()
         with col2:
-            if st.button("📥 Export Chat", use_container_width=True):
-                if st.session_state.messages:
-                    chat_text = "\n\n".join([f"**{m['role'].upper()}**\n{m['content']}" for m in st.session_state.messages])
-                    st.download_button(
-                        label="Download",
-                        data=chat_text,
-                        file_name="chat_history.txt",
-                        mime="text/plain"
-                    )
-    
+            if st.button("🗑️", key=f"del_{chat['id']}", help="Delete chat"):
+                st.session_state.history.pop(i)
+                if st.session_state.current_chat_id == chat["id"]:
+                    st.session_state.current_chat_id = st.session_state.history[0]["id"] if st.session_state.history else None
+                save_history(st.session_state.history)
+                st.rerun()
+
     st.markdown("---")
-    
-    # Chat history
-    with st.expander("📚 Conversation History"):
-        if st.session_state.messages:
-            st.markdown(f"**Messages: {len(st.session_state.messages)}**")
-            # Show last 5 messages summary
-            for msg in st.session_state.messages[-5:]:
-                if msg['role'] == 'user':
-                    st.markdown(f"👤 {msg['content'][:50]}...")
-                else:
-                    st.markdown(f"🤖 {msg['content'][:50]}...")
-        else:
-            st.info("No conversations yet. Start chatting!")
+    if st.button("📥 Export Current Chat", use_container_width=True):
+        if messages:
+            chat_text = "\n\n".join([f"**{m['role'].upper()}**\n{m['content']}" for m in messages])
+            st.download_button(
+                label="Confirm Download",
+                data=chat_text,
+                file_name="chat_history.txt",
+                mime="text/plain"
+            )
 
 # Main chat area
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Display chat messages
-if st.session_state.messages:
-    st.markdown("### 💭 Conversation")
-    
-    for message in st.session_state.messages:
-        if message["role"] == "user":
-            # User message - right aligned
-            col1, col2 = st.columns([2, 3])
-            with col2:
-                st.markdown(
-                    f"""
-                    <div style="background: #34343d; padding: 1rem 1.5rem; border-radius: 0.75rem; 
-                                color: #e4e1ed; animation: slideInRight 0.4s ease-out; 
-                                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-                    {message['content']}
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-        else:
-            # Assistant message - left aligned
-            col1, col2 = st.columns([3, 2])
-            with col1:
-                st.markdown(
-                    f"""
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%;
-                                    background: linear-gradient(135deg, #7c87f3 0%, #bdc2ff 100%);
-                                    display: flex; align-items: center; justify-content: center;
-                                    color: white; font-weight: 700; flex-shrink: 0;">
-                            ✨
-                        </div>
-                        <div style="background: #1f1f27; padding: 1rem 1.5rem; border-radius: 0.75rem;
-                                    color: #e4e1ed; animation: slideInLeft 0.4s ease-out;">
-                            {message['content']}
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-else:
+if not st.session_state.current_chat_id:
     # Welcome state
     st.markdown("""
     <div style="text-align: center; padding: 4rem 2rem; color: #c7c4d7;">
@@ -431,56 +321,66 @@ else:
             Your gateway to intelligent conversations powered by Bytez AI's Gemma 4 26B model.
         </p>
         <p style="color: #908fa0; margin-top: 2rem;">
-            Start typing your message below to begin...
+            Click 'New Chat' in the sidebar to begin...
         </p>
     </div>
     """, unsafe_allow_html=True)
+else:
+    # Display chat messages
+    for message in messages:
+        if message["role"] == "user":
+            col1, col2 = st.columns([1, 4])
+            with col2:
+                st.markdown(f'<div class="user-message"><div class="user-message-content">{message["content"]}</div></div>', unsafe_allow_html=True)
+        else:
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f'''
+                    <div class="assistant-message">
+                        <div class="assistant-avatar">✨</div>
+                        <div class="assistant-message-content">{message["content"]}</div>
+                    </div>
+                ''', unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Chat input
-if prompt := st.chat_input("Type your message here...", key="chat_input"):
-    # Add user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    # Show loading state
-    with st.spinner(""):
-        loading_placeholder = st.empty()
-        loading_placeholder.markdown(
-            """
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem;">
-                <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(189, 194, 255, 0.3);
-                            border-radius: 50%; border-top-color: #bdc2ff; animation: spin 1s linear infinite;"></div>
-                <span style="color: #c7c4d7;">Scholar is thinking...</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+    # Chat input
+    if prompt := st.chat_input("Type your message here..."):
+        # Add user message
+        messages.append({"role": "user", "content": prompt})
         
-        # Get response from Bytez SDK
-        try:
-            # Prepare messages with system prompt
-            messages = [{"role": "system", "content": system_prompt}] + [
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ]
-            
-            # Run model
-            results = model.run(messages)
-            
-            loading_placeholder.empty()
-            
-            if results.error:
-                st.error(f"❌ Error: {results.error}")
-                st.session_state.messages.pop()  # Remove user message on error
-            else:
-                # Add assistant response
-                response = results.output
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                st.rerun()
+        # Update title if it's the first message
+        if len(messages) == 1:
+            current_chat["title"] = prompt[:30] + ("..." if len(prompt) > 30 else "")
+        
+        save_history(st.session_state.history)
+        st.rerun()
+
+    # Generate response if last message is from user
+    if messages and messages[-1]["role"] == "user":
+        with st.spinner("Scholar is thinking..."):
+            try:
+                # Prepare messages with system prompt
+                api_messages = [{"role": "system", "content": system_prompt}] + messages
                 
-        except Exception as e:
-            loading_placeholder.empty()
-            st.error(f"❌ An error occurred: {e}")
-            st.info("💡 Check your API key, model ID, or network connection.")
-            st.session_state.messages.pop()  # Remove user message on error
+                # Run model
+                results = model.run(api_messages)
+                
+                if results.error:
+                    st.error(f"❌ Error: {results.error}")
+                else:
+                    # FIX: Handle dict output or string output
+                    response_data = results.output
+                    if isinstance(response_data, dict) and "content" in response_data:
+                        response = response_data["content"]
+                    elif isinstance(response_data, str):
+                        response = response_data
+                    else:
+                        response = str(response_data)
+                        
+                    messages.append({"role": "assistant", "content": response})
+                    save_history(st.session_state.history)
+                    st.rerun()
+                    
+            except Exception as e:
+                st.error(f"❌ An error occurred: {e}")
+                messages.pop() # Remove user message on error
+                save_history(st.session_state.history)
