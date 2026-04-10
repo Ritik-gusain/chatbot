@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Luminescent Scholar - AI Chat & Image Generation powered by Bytez AI">
+    <title>Luminescent Scholar — AI Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+</head>
+<body>
+    <!-- Ambient background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-group">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#logoGrad)" />
+                            <defs>
+                                <linearGradient id="logoGrad" x1="2" y1="2" x2="22" y2="22">
+                                    <stop offset="0%" stop-color="#7c6cfc"/>
+                                    <stop offset="100%" stop-color="#60a5fa"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">Luminescent</span>
+                        <span class="logo-subtitle">Scholar AI</span>
+                    </div>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mode Nav -->
+            <div class="sidebar-mode-nav">
+                <button class="mode-nav-btn active" id="navChat" data-mode="chat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    Chat
+                </button>
+                <button class="mode-nav-btn" id="navImage" data-mode="image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    Image Gen
+                </button>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>New Conversation</span>
+            </button>
+
+            <div class="sidebar-section">
+                <div class="section-label">Recent Chats</div>
+                <div class="chat-history" id="chatHistory"></div>
+            </div>
+
+            <div class="sidebar-section sidebar-section-settings">
+                <div class="section-label">Settings</div>
+
+                <div class="setting-item" id="chatSettingsGroup">
+                    <label class="setting-label" for="systemPrompt">System Prompt</label>
+                    <textarea id="systemPrompt" class="setting-textarea" rows="3" placeholder="Customize AI behavior...">You are a helpful and advanced AI assistant. Provide clear, concise, and intelligent responses.</textarea>
+                </div>
+
+                <div class="setting-item">
+                    <label class="setting-label">AI Model</label>
+                    <div class="model-selector-wrap">
+                        <button class="model-selector-btn" id="modelSelectorBtn">
+                            <div class="model-selector-left">
+                                <div class="model-status-dot"></div>
+                                <span id="modelBadgeText">Loading…</span>
+                            </div>
+                            <svg class="model-selector-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                        <div class="model-dropdown" id="modelDropdown">
+                            <!-- Populated by JS buildModelSelector() -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-info">
+                    <span class="footer-powered">Powered by Bytez AI</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main class="main-content" id="mainContent">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+                <div class="topbar-title">
+                    <h1 id="conversationTitle">New Conversation</h1>
+                </div>
+                <div class="topbar-actions">
+                    <!-- Mode pill toggle -->
+                    <div class="topbar-mode-toggle">
+                        <button class="mode-pill active" id="modePillChat" data-mode="chat">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                            </svg>
+                            Chat
+                        </button>
+                        <button class="mode-pill" id="modePillImage" data-mode="image">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            Image
+                        </button>
+                    </div>
+                    <button class="topbar-btn" id="exportBtn" title="Export chat">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                        </svg>
+                    </button>
+                    <button class="topbar-btn" id="clearBtn" title="Clear chat">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ===== CHAT PANEL ===== -->
+            <div class="panel" id="chatPanel">
+                <div class="chat-area" id="chatArea">
+                    <!-- Welcome Screen -->
+                    <div class="welcome-screen" id="welcomeScreen">
+                        <div class="welcome-icon-wrapper">
+                            <div class="welcome-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#welcomeGrad)" />
+                                    <defs>
+                                        <linearGradient id="welcomeGrad" x1="2" y1="2" x2="22" y2="22">
+                                            <stop offset="0%" stop-color="#7c6cfc"/>
+                                            <stop offset="50%" stop-color="#818cf8"/>
+                                            <stop offset="100%" stop-color="#60a5fa"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="welcome-glow"></div>
+                        </div>
+                        <h2 class="welcome-title">How can I help you today?</h2>
+                        <p class="welcome-subtitle">I'm The Luminescent Scholar — your AI companion for chat and image creation.</p>
+
+                        <div class="suggestion-grid">
+                            <button class="suggestion-card" data-prompt="Explain quantum computing in simple terms">
+                                <div class="suggestion-icon">🧠</div>
+                                <div class="suggestion-text">
+                                    <span class="suggestion-title">Explain a concept</span>
+                                    <span class="suggestion-desc">Break down quantum computing</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-card" data-prompt="Write a Python function to sort a list using merge sort with detailed comments">
+                                <div class="suggestion-icon">💻</div>
+                                <div class="suggestion-text">
+                                    <span class="suggestion-title">Write some code</span>
+                                    <span class="suggestion-desc">Merge sort in Python</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-card" data-prompt="Help me brainstorm creative names for a tech startup focused on AI education">
+                                <div class="suggestion-icon">💡</div>
+                                <div class="suggestion-text">
+                                    <span class="suggestion-title">Brainstorm ideas</span>
+                                    <span class="suggestion-desc">Creative startup names</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-card" data-prompt="Compare the pros and cons of React vs Vue.js for a new web project">
+                                <div class="suggestion-icon">⚖️</div>
+                                <div class="suggestion-text">
+                                    <span class="suggestion-title">Compare options</span>
+                                    <span class="suggestion-desc">React vs Vue.js</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="messages-container" id="messagesContainer"></div>
+
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                        <div class="typing-avatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#typingGrad)" />
+                                <defs>
+                                    <linearGradient id="typingGrad" x1="2" y1="2" x2="22" y2="22">
+                                        <stop offset="0%" stop-color="#7c6cfc"/>
+                                        <stop offset="100%" stop-color="#60a5fa"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <div class="typing-content">
+                            <span class="typing-label">Scholar is thinking</span>
+                            <div class="typing-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="input-area">
+                    <div class="input-wrapper" id="inputWrapper">
+                        <div class="input-glow"></div>
+                        <textarea
+                            id="messageInput"
+                            class="message-input"
+                            placeholder="Message Scholar..."
+                            rows="1"
+                            autofocus
+                        ></textarea>
+                        <div class="input-actions">
+                            <span class="char-count" id="charCount">0</span>
+                            <button class="send-btn" id="sendBtn" disabled aria-label="Send message">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="input-disclaimer">Scholar may produce inaccurate information. Verify important details.</p>
+                </div>
+            </div>
+
+            <!-- ===== IMAGE GENERATION PANEL ===== -->
+            <div class="panel hidden" id="imagePanel">
+                <div class="image-gen-area">
+
+                    <!-- Hero header -->
+                    <div class="img-gen-header">
+                        <div class="img-gen-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                <defs>
+                                    <linearGradient id="imgGrad" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#7c6cfc"/>
+                                        <stop offset="100%" stop-color="#f472b6"/>
+                                    </linearGradient>
+                                </defs>
+                                <rect x="3" y="3" width="18" height="18" rx="3" fill="url(#imgGrad)" opacity="0.2"/>
+                                <rect x="3" y="3" width="18" height="18" rx="3" stroke="url(#imgGrad)" stroke-width="1.5" fill="none"/>
+                                <circle cx="8.5" cy="8.5" r="1.5" fill="url(#imgGrad)"/>
+                                <polyline points="21 15 16 10 5 21" stroke="url(#imgGrad)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="img-gen-title">AI Image Studio</h2>
+                            <p class="img-gen-subtitle">Powered by Playground v2.5 · 1024px aesthetic model</p>
+                        </div>
+                    </div>
+
+                    <!-- Prompt input box -->
+                    <div class="img-prompt-box">
+                        <div class="img-prompt-inner">
+                            <svg class="img-prompt-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <textarea
+                                id="imagePromptInput"
+                                class="img-prompt-textarea"
+                                placeholder="Describe the image you want to create... e.g. &quot;A cat in a wizard hat, cinematic lighting&quot;"
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <!-- Quick style tags -->
+                        <div class="style-tags">
+                            <span class="style-tag-label">Quick styles:</span>
+                            <button class="style-tag" data-tag="cinematic lighting, photorealistic">📸 Photorealistic</button>
+                            <button class="style-tag" data-tag="digital art, vibrant colors, trending on artstation">🎨 Digital Art</button>
+                            <button class="style-tag" data-tag="anime style, cel shading, Studio Ghibli">✨ Anime</button>
+                            <button class="style-tag" data-tag="oil painting, impressionist, classical">🖼️ Oil Painting</button>
+                            <button class="style-tag" data-tag="cyberpunk, neon lights, futuristic city">🌆 Cyberpunk</button>
+                            <button class="style-tag" data-tag="watercolor, soft, dreamy">💧 Watercolor</button>
+                        </div>
+
+                        <div class="img-prompt-actions">
+                            <span class="img-char-count" id="imgCharCount">0 / 500</span>
+                            <button class="img-generate-btn" id="generateImageBtn" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                </svg>
+                                Generate Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generation progress -->
+                    <div class="img-generating" id="imgGenerating" style="display:none">
+                        <div class="img-gen-spinner">
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring spinner-ring-2"></div>
+                        </div>
+                        <div class="img-gen-progress-text">
+                            <span id="genProgressLabel">Generating your image...</span>
+                            <span class="gen-model-tag">playground-v2.5-1024px-aesthetic</span>
+                        </div>
+                    </div>
+
+                    <!-- Gallery -->
+                    <div class="img-gallery-section" id="imgGallerySection">
+                        <div class="img-gallery-header">
+                            <span class="img-gallery-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                                Generated Images
+                            </span>
+                            <button class="gallery-clear-btn" id="galleryClearBtn" title="Clear gallery">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                                Clear All
+                            </button>
+                        </div>
+                        <div class="img-gallery" id="imgGallery">
+                            <div class="gallery-empty" id="galleryEmpty">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                                <p>Your generated images will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Image Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <img id="lightboxImg" src="" alt="Generated image">
+            <div class="lightbox-footer">
+                <p id="lightboxPrompt" class="lightbox-prompt"></p>
+                <a id="lightboxDownload" class="lightbox-download-btn" download="scholar-image.png">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    Download
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
