@@ -4,107 +4,107 @@
    ================================================ */
 
 // ===== API Key =====
-const BYTEZ_API_KEY = '510034cf57f565ca955e871952bf486d';
+const BYTEZ_API_KEY = '\keys\bytez_api_key.txt';
 
 // ===== Free-tier Chat Models (Bytez) =====
 const FREE_CHAT_MODELS = [
     // ── Meta Llama ──────────────────────────────
     {
-        id:       'meta-llama/Llama-3.1-8B-Instruct',
-        name:     'Llama 3.1 8B',
+        id: 'meta-llama/Llama-3.1-8B-Instruct',
+        name: 'Llama 3.1 8B',
         provider: 'Meta',
-        tag:      '⚡ Fast',
-        desc:     'Great all-rounder. Fast & free.',
+        tag: '⚡ Fast',
+        desc: 'Great all-rounder. Fast & free.',
     },
     {
-        id:       'meta-llama/Llama-3.2-3B-Instruct',
-        name:     'Llama 3.2 3B',
+        id: 'meta-llama/Llama-3.2-3B-Instruct',
+        name: 'Llama 3.2 3B',
         provider: 'Meta',
-        tag:      '🚀 Fastest',
-        desc:     'Ultra-fast lightweight model.',
+        tag: '🚀 Fastest',
+        desc: 'Ultra-fast lightweight model.',
     },
     // ── Google Gemma ────────────────────────────
     {
-        id:       'google/gemma-3-4b-it',
-        name:     'Gemma 3 4B',
+        id: 'google/gemma-3-4b-it',
+        name: 'Gemma 3 4B',
         provider: 'Google',
-        tag:      '🆓 Free',
-        desc:     'Google Gemma 3, 4B instruction-tuned.',
+        tag: '🆓 Free',
+        desc: 'Google Gemma 3, 4B instruction-tuned.',
     },
     {
-        id:       'google/gemma-4-E2B-it',
-        name:     'Gemma 4 2B',
+        id: 'google/gemma-4-E2B-it',
+        name: 'Gemma 4 2B',
         provider: 'Google',
-        tag:      '🆓 Free',
-        desc:     'Compact Gemma 4 efficiency model.',
+        tag: '🆓 Free',
+        desc: 'Compact Gemma 4 efficiency model.',
     },
     {
-        id:       'google/gemma-4-26B-A4B-it',
-        name:     'Gemma 4 26B',
+        id: 'google/gemma-4-26B-A4B-it',
+        name: 'Gemma 4 26B',
         provider: 'Google',
-        tag:      '🧠 Smart',
-        desc:     'Larger Gemma 4, more capable.',
+        tag: '🧠 Smart',
+        desc: 'Larger Gemma 4, more capable.',
     },
     // ── Mistral ─────────────────────────────────
     {
-        id:       'mistralai/Mistral-7B-Instruct-v0.3',
-        name:     'Mistral 7B',
+        id: 'mistralai/Mistral-7B-Instruct-v0.3',
+        name: 'Mistral 7B',
         provider: 'Mistral',
-        tag:      '⚡ Fast',
-        desc:     'Mistral 7B instruction-tuned v0.3.',
+        tag: '⚡ Fast',
+        desc: 'Mistral 7B instruction-tuned v0.3.',
     },
     {
-        id:       'mistralai/Mistral-Nemo-Instruct-2407',
-        name:     'Mistral Nemo',
+        id: 'mistralai/Mistral-Nemo-Instruct-2407',
+        name: 'Mistral Nemo',
         provider: 'Mistral',
-        tag:      '📖 Long ctx',
-        desc:     'Mistral Nemo with long context support.',
+        tag: '📖 Long ctx',
+        desc: 'Mistral Nemo with long context support.',
     },
     // ── Microsoft Phi ───────────────────────────
     {
-        id:       'microsoft/phi-4-mini',
-        name:     'Phi-4 Mini',
+        id: 'microsoft/phi-4-mini',
+        name: 'Phi-4 Mini',
         provider: 'Microsoft',
-        tag:      '🧮 Reasoning',
-        desc:     'Compact reasoning & math specialist.',
+        tag: '🧮 Reasoning',
+        desc: 'Compact reasoning & math specialist.',
     },
     {
-        id:       'microsoft/phi-4',
-        name:     'Phi-4',
+        id: 'microsoft/phi-4',
+        name: 'Phi-4',
         provider: 'Microsoft',
-        tag:      '🧮 Reasoning',
-        desc:     'Powerful reasoning & math model.',
+        tag: '🧮 Reasoning',
+        desc: 'Powerful reasoning & math model.',
     },
     // ── Qwen ────────────────────────────────────
     {
-        id:       'Qwen/Qwen3-0.6B',
-        name:     'Qwen3 0.6B',
+        id: 'Qwen/Qwen3-0.6B',
+        name: 'Qwen3 0.6B',
         provider: 'Alibaba',
-        tag:      '🚀 Fastest',
-        desc:     'Tiny but surprisingly capable.',
+        tag: '🚀 Fastest',
+        desc: 'Tiny but surprisingly capable.',
     },
     {
-        id:       'Qwen/Qwen3-8B',
-        name:     'Qwen3 8B',
+        id: 'Qwen/Qwen3-8B',
+        name: 'Qwen3 8B',
         provider: 'Alibaba',
-        tag:      '⚡ Fast',
-        desc:     'Qwen3 8B — solid multilingual model.',
+        tag: '⚡ Fast',
+        desc: 'Qwen3 8B — solid multilingual model.',
     },
     // ── DeepSeek ────────────────────────────────
     {
-        id:       'deepseek-ai/DeepSeek-R1',
-        name:     'DeepSeek R1',
+        id: 'deepseek-ai/DeepSeek-R1',
+        name: 'DeepSeek R1',
         provider: 'DeepSeek',
-        tag:      '🧠 Reasoning',
-        desc:     'Strong reasoning & coding model.',
+        tag: '🧠 Reasoning',
+        desc: 'Strong reasoning & coding model.',
     },
     // ── ZhipuAI ─────────────────────────────────
     {
-        id:       'zai-org/GLM-4.7-Flash',
-        name:     'GLM 4.7 Flash',
+        id: 'zai-org/GLM-4.7-Flash',
+        name: 'GLM 4.7 Flash',
         provider: 'ZhipuAI',
-        tag:      '⚡ Fast',
-        desc:     'Flash-optimised 31B GLM model.',
+        tag: '⚡ Fast',
+        desc: 'Flash-optimised 31B GLM model.',
     },
 ];
 
@@ -117,14 +117,14 @@ function getChatApiUrl() {
 }
 
 // Image model (fixed)
-const IMAGE_MODEL   = 'playgroundai/playground-v2.5-1024px-aesthetic';
+const IMAGE_MODEL = 'playgroundai/playground-v2.5-1024px-aesthetic';
 const IMAGE_API_URL = `https://api.bytez.com/models/v2/${IMAGE_MODEL}`;
 
 // ===== State =====
 const state = {
-    conversations:         loadConversationsFromStorage(),
-    activeConversationId:  null,
-    isGenerating:          false,
+    conversations: loadConversationsFromStorage(),
+    activeConversationId: null,
+    isGenerating: false,
 };
 
 // ===== Persistence =====
@@ -137,60 +137,60 @@ function saveState() {
 }
 
 // ===== DOM helpers =====
-const $  = (sel) => document.querySelector(sel);
+const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
 const elements = {
-    sidebar:           $('#sidebar'),
-    sidebarToggle:     $('#sidebarToggle'),
-    mobileMenuBtn:     $('#mobileMenuBtn'),
-    newChatBtn:        $('#newChatBtn'),
-    chatHistory:       $('#chatHistory'),
-    chatArea:          $('#chatArea'),
-    welcomeScreen:     $('#welcomeScreen'),
+    sidebar: $('#sidebar'),
+    sidebarToggle: $('#sidebarToggle'),
+    mobileMenuBtn: $('#mobileMenuBtn'),
+    newChatBtn: $('#newChatBtn'),
+    chatHistory: $('#chatHistory'),
+    chatArea: $('#chatArea'),
+    welcomeScreen: $('#welcomeScreen'),
     messagesContainer: $('#messagesContainer'),
-    typingIndicator:   $('#typingIndicator'),
-    typingLabel:       $('#typingLabel'),
-    typingHint:        $('#typingHint'),
-    messageInput:      $('#messageInput'),
-    sendBtn:           $('#sendBtn'),
-    charCount:         $('#charCount'),
-    clearBtn:          $('#clearBtn'),
-    exportBtn:         $('#exportBtn'),
+    typingIndicator: $('#typingIndicator'),
+    typingLabel: $('#typingLabel'),
+    typingHint: $('#typingHint'),
+    messageInput: $('#messageInput'),
+    sendBtn: $('#sendBtn'),
+    charCount: $('#charCount'),
+    clearBtn: $('#clearBtn'),
+    exportBtn: $('#exportBtn'),
     conversationTitle: $('#conversationTitle'),
-    toast:             $('#toast'),
-    toastMessage:      $('#toastMessage'),
-    inputWrapper:      $('#inputWrapper'),
-    systemPrompt:      $('#systemPrompt'),
-    modelBadgeText:    $('#modelBadgeText'),
+    toast: $('#toast'),
+    toastMessage: $('#toastMessage'),
+    inputWrapper: $('#inputWrapper'),
+    systemPrompt: $('#systemPrompt'),
+    modelBadgeText: $('#modelBadgeText'),
     // Mode
-    chatPanel:         $('#chatPanel'),
-    imagePanel:        $('#imagePanel'),
-    modePillChat:      $('#modePillChat'),
-    modePillImage:     $('#modePillImage'),
-    navChat:           $('#navChat'),
-    navImage:          $('#navImage'),
+    chatPanel: $('#chatPanel'),
+    imagePanel: $('#imagePanel'),
+    modePillChat: $('#modePillChat'),
+    modePillImage: $('#modePillImage'),
+    navChat: $('#navChat'),
+    navImage: $('#navImage'),
     // Image gen
-    imagePromptInput:  $('#imagePromptInput'),
-    generateImageBtn:  $('#generateImageBtn'),
-    imgCharCount:      $('#imgCharCount'),
-    imgGenerating:     $('#imgGenerating'),
-    genProgressLabel:  $('#genProgressLabel'),
-    imgGallery:        $('#imgGallery'),
-    galleryEmpty:      $('#galleryEmpty'),
-    galleryClearBtn:   $('#galleryClearBtn'),
+    imagePromptInput: $('#imagePromptInput'),
+    generateImageBtn: $('#generateImageBtn'),
+    imgCharCount: $('#imgCharCount'),
+    imgGenerating: $('#imgGenerating'),
+    genProgressLabel: $('#genProgressLabel'),
+    imgGallery: $('#imgGallery'),
+    galleryEmpty: $('#galleryEmpty'),
+    galleryClearBtn: $('#galleryClearBtn'),
     // Lightbox
-    lightbox:          $('#lightbox'),
-    lightboxImg:       $('#lightboxImg'),
-    lightboxPrompt:    $('#lightboxPrompt'),
-    lightboxDownload:  $('#lightboxDownload'),
-    lightboxClose:     $('#lightboxClose'),
-    lightboxBackdrop:  $('#lightboxBackdrop'),
+    lightbox: $('#lightbox'),
+    lightboxImg: $('#lightboxImg'),
+    lightboxPrompt: $('#lightboxPrompt'),
+    lightboxDownload: $('#lightboxDownload'),
+    lightboxClose: $('#lightboxClose'),
+    lightboxBackdrop: $('#lightboxBackdrop'),
     // Model selector
-    modelSelectorBtn:  $('#modelSelectorBtn'),
-    modelDropdown:     $('#modelDropdown'),
-    modelBadgeText:    $('#modelBadgeText'),
-    modelBadgeDot:     $('#modelBadgeDot'),
+    modelSelectorBtn: $('#modelSelectorBtn'),
+    modelDropdown: $('#modelDropdown'),
+    modelBadgeText: $('#modelBadgeText'),
+    modelBadgeDot: $('#modelBadgeDot'),
 };
 
 // ===== App mode ('chat' | 'image') =====
@@ -308,11 +308,11 @@ function bindEvents() {
     });
 
     // Mode toggle — topbar pills
-    elements.modePillChat.addEventListener('click',  () => switchMode('chat'));
+    elements.modePillChat.addEventListener('click', () => switchMode('chat'));
     elements.modePillImage.addEventListener('click', () => switchMode('image'));
 
     // Mode toggle — sidebar nav
-    elements.navChat.addEventListener('click',  () => switchMode('chat'));
+    elements.navChat.addEventListener('click', () => switchMode('chat'));
     elements.navImage.addEventListener('click', () => switchMode('image'));
 
     // Image prompt input
@@ -399,7 +399,7 @@ function closeMobileSidebar() {
 }
 
 // ===== Conversations =====
-function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,9); }
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 9); }
 
 function startNewConversation() {
     const active = getActiveConversation();
@@ -538,7 +538,7 @@ async function getAIResponse(conv) {
 
     // Reset typing label
     if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
-    if (elements.typingHint)  elements.typingHint.textContent = '';
+    if (elements.typingHint) elements.typingHint.textContent = '';
 
     // Cold-start hints — shown if the model takes too long (free tier spins up)
     const coldStartTimer1 = setTimeout(() => {
@@ -578,7 +578,7 @@ Keep responses focused and avoid unnecessary padding. Never truncate your respon
 
         if (!response.ok) {
             let errBody = '';
-            try { errBody = await response.text(); } catch {}
+            try { errBody = await response.text(); } catch { }
             throw new Error(`HTTP ${response.status}: ${errBody}`);
         }
 
@@ -620,7 +620,7 @@ Keep responses focused and avoid unnecessary padding. Never truncate your respon
         clearTimeout(coldStartTimer2);
         elements.typingIndicator.style.display = 'none';
         if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
-        if (elements.typingHint)  elements.typingHint.textContent = '';
+        if (elements.typingHint) elements.typingHint.textContent = '';
 
         const errMsg = {
             role: 'assistant',
@@ -635,7 +635,7 @@ Keep responses focused and avoid unnecessary padding. Never truncate your respon
         clearTimeout(coldStartTimer1);
         clearTimeout(coldStartTimer2);
         if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
-        if (elements.typingHint)  elements.typingHint.textContent = '';
+        if (elements.typingHint) elements.typingHint.textContent = '';
         state.isGenerating = false;
         if (elements.sendBtn) elements.sendBtn.disabled = elements.messageInput.value.trim().length === 0;
     }
@@ -739,7 +739,7 @@ function appendMessageToDOM(msg, animate = true) {
 
     const roleLabel = isUser ? 'You' : 'Scholar';
     const roleClass = isUser ? 'user-role' : 'assistant-role';
-    const rendered  = isUser ? `<p>${escapeHtml(msg.content)}</p>` : renderMarkdown(msg.content);
+    const rendered = isUser ? `<p>${escapeHtml(msg.content)}</p>` : renderMarkdown(msg.content);
 
     row.innerHTML = `
         ${avatarHTML}
@@ -789,8 +789,8 @@ function renderMarkdown(text) {
 
     // Headers
     html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm,  '<h2>$1</h2>');
-    html = html.replace(/^# (.+)$/gm,   '<h1>$1</h1>');
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
     // Blockquotes
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
@@ -905,8 +905,8 @@ function exportChat() {
         text += `**${role}** _(${time})_\n\n${msg.content}\n\n---\n\n`;
     });
     const blob = new Blob([text], { type: 'text/markdown' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url;
     a.download = `${conv.title.replace(/[^a-z0-9]/gi, '_')}_export.md`;
     a.click();
@@ -915,7 +915,7 @@ function exportChat() {
 }
 
 // ===== Code Copy (global) =====
-window.copyCode = function(btn) {
+window.copyCode = function (btn) {
     const code = btn.parentElement.querySelector('code').textContent;
     navigator.clipboard.writeText(code).then(() => {
         btn.textContent = 'Copied!';
@@ -941,7 +941,7 @@ function loadImageGalleryFromStorage() {
 function saveGallery() {
     // Only save last 20 (base64 can get large)
     const toSave = imageGallery.slice(0, 20);
-    try { localStorage.setItem('ls_imageGallery', JSON.stringify(toSave)); } catch {}
+    try { localStorage.setItem('ls_imageGallery', JSON.stringify(toSave)); } catch { }
 }
 
 async function generateImage() {
@@ -979,7 +979,7 @@ async function generateImage() {
 
         if (!response.ok) {
             let errBody = '';
-            try { errBody = await response.text(); } catch {}
+            try { errBody = await response.text(); } catch { }
             throw new Error(`HTTP ${response.status}: ${errBody}`);
         }
 
@@ -1008,10 +1008,10 @@ async function generateImage() {
         // Build src — handle base64 or URL
         const src = imageData.startsWith('http') ? imageData
             : imageData.startsWith('data:') ? imageData
-            : `data:image/png;base64,${imageData}`;
+                : `data:image/png;base64,${imageData}`;
 
         const item = {
-            id:        Date.now().toString(36),
+            id: Date.now().toString(36),
             src,
             prompt,
             createdAt: new Date().toISOString(),
@@ -1142,7 +1142,7 @@ function switchMode(mode) {
         : 'AI Image Studio';
 
     if (isChat) elements.messageInput.focus();
-    else        elements.imagePromptInput.focus();
+    else elements.imagePromptInput.focus();
 }
 
 // ===== Boot =====
