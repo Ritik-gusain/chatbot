@@ -135,6 +135,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js"></script>
   <script>
     /**
@@ -147,13 +148,15 @@
     /** @type {string|null} The generated OTP for the current session */
     let currentOTP = null;
 
-    /** @type {Object|null} Pending user data waiting for OTP verification */
-    let pendingUser = null;
+    /** @type {string|null} Pending user email waiting for OTP verification */
+    let pendingUserEmail = null;
 
     /**
      * Initializes the login page on DOM load.
      */
-    document.addEventListener('DOMContentLoaded', function initLoginPage() {
+    document.addEventListener('DOMContentLoaded', async function initLoginPage() {
+      await initSupabase();
+
       /* Initialize starfield */
       initStarfield();
 
@@ -207,7 +210,7 @@
       /* Reset OTP state */
       otpSection.classList.remove('active');
       currentOTP = null;
-      pendingUser = null;
+      pendingUserEmail = null;
 
       /* Clear errors */
       clearAllErrors();
@@ -258,9 +261,28 @@
 
         if (hasError) return;
 
-        /* Generate OTP and show verification */
-        pendingUser = { name: email.split('@')[0], email: email };
-        initiateOTPVerification();
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        loginSubmitBtn.textContent = 'Signing in...';
+        loginSubmitBtn.disabled = true;
+
+        if (!supabase) {
+          showToast('Supabase Anon Key is missing in auth.js', 'error');
+          loginSubmitBtn.textContent = 'Sign In';
+          loginSubmitBtn.disabled = false;
+          return;
+        }
+
+        supabase.auth.signInWithPassword({ email, password }).then(({ data, error }) => {
+          loginSubmitBtn.textContent = 'Sign In';
+          loginSubmitBtn.disabled = false;
+
+          if (error) {
+            showToast(error.message, 'error');
+          } else {
+            showToast('Login successful!', 'success');
+            setTimeout(() => window.location.href = 'chat.html', 800);
+          }
+        });
       });
 
       registerForm.addEventListener('submit', function handleRegisterSubmit(event) {
@@ -297,9 +319,38 @@
 
         if (hasError) return;
 
-        /* Generate OTP and show verification */
-        pendingUser = { name: name, email: email };
-        initiateOTPVerification();
+        const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+        registerSubmitBtn.textContent = 'Creating...';
+        registerSubmitBtn.disabled = true;
+
+        if (!supabase) {
+          showToast('Supabase Anon Key is missing in auth.js', 'error');
+          registerSubmitBtn.textContent = 'Create Account';
+          registerSubmitBtn.disabled = false;
+          return;
+        }
+
+        supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: { data: { full_name: name } }
+        }).then(({ data, error }) => {
+          registerSubmitBtn.textContent = 'Create Account';
+          registerSubmitBtn.disabled = false;
+
+          if (error) {
+            showToast(error.message, 'error');
+            return;
+          }
+
+          if (data.session) {
+            showToast('Registration successful!', 'success');
+            setTimeout(() => window.location.href = 'chat.html', 800);
+          } else {
+            pendingUserEmail = email;
+            initiateOTPVerification();
+          }
+        });
       });
     }
 
@@ -308,8 +359,6 @@
      * @returns {void}
      */
     function initiateOTPVerification() {
-      currentOTP = generateOTP();
-
       /* Hide forms, show OTP section */
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('registerForm').style.display = 'none';
@@ -318,13 +367,14 @@
       const otpSection = document.getElementById('otpSection');
       otpSection.classList.add('active');
 
-      /* Show the OTP code in the demo box */
-      document.getElementById('otpDisplayCode').textContent = currentOTP;
+      /* Hide the demo box since we rely on real emails now */
+      const demoBox = document.getElementById('otpDemoBox');
+      if (demoBox) demoBox.style.display = 'none';
 
       /* Focus the first OTP input */
       document.getElementById('otpDigit0').focus();
 
-      showToast('OTP generated! Enter it below to continue.', 'success');
+      showToast('Check your email for the 6-digit confirmation code.', 'success');
     }
 
     /**
@@ -394,20 +444,29 @@
         return;
       }
 
-      if (enteredOTP !== currentOTP) {
-        otpErrorField.textContent = 'Invalid OTP. Please try again.';
-        showToast('Incorrect OTP!', 'error');
-        return;
-      }
+      const verifyBtn = document.getElementById('verifyOtpBtn');
+      verifyBtn.textContent = 'Verifying...';
+      verifyBtn.disabled = true;
 
-      /* Success — save session and redirect */
-      otpErrorField.textContent = '';
-      saveSession(pendingUser);
-      showToast('Verification successful! Redirecting...', 'success');
+      supabase.auth.verifyOtp({
+        email: pendingUserEmail,
+        token: enteredOTP,
+        type: 'signup'
+      }).then(({ data, error }) => {
+        verifyBtn.textContent = 'Verify & Continue';
+        verifyBtn.disabled = false;
 
-      setTimeout(function() {
-        window.location.href = 'chat.html';
-      }, 800);
+        if (error) {
+          otpErrorField.textContent = error.message;
+          showToast('Invalid confirmation code.', 'error');
+        } else {
+          otpErrorField.textContent = '';
+          showToast('Verification successful! Redirecting...', 'success');
+          setTimeout(function() {
+            window.location.href = 'chat.html';
+          }, 800);
+        }
+      });
     }
 
     /**

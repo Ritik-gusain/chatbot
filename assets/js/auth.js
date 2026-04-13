@@ -1,97 +1,105 @@
 /**
  * =========================================================
- *  Luminescent.io — Auth Module
- *  Handles JWT simulation, sessions, OTP, redirects
+ *  Luminescent.io — Supabase Auth Module
+ *  Handles Supabase initialization, auth flows, and session management
  * =========================================================
  */
 
-const SESSION_KEY = 'lum_session';
+/* Keys are fetched dynamically from the /keys directory */
+const SUPABASE_URL = 'https://lbinyquyfxdfcckcyskl.supabase.co';
+let supabase = null;
+let _supabaseInitPromise = null;
 
-/**
- * Generates a random 6-digit OTP string.
- * @returns {string} A 6-digit numeric string, e.g. "482910"
- */
-function generateOTP() {
-  const otpValue = Math.floor(100000 + Math.random() * 900000);
-  return otpValue.toString();
+async function initSupabase() {
+  if (_supabaseInitPromise) return _supabaseInitPromise;
+  
+  _supabaseInitPromise = (async () => {
+    if (typeof window.supabase === 'undefined') {
+      console.warn('Supabase SDK not loaded. Please ensure the CDN script is included.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/keys/supabase_anon_key.txt');
+      if (!response.ok) throw new Error('Failed to fetch key');
+      const anonKey = (await response.text()).trim();
+      
+      if (anonKey && !anonKey.includes('YOUR_SUPABASE')) {
+        supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
+      } else {
+        console.warn('Supabase key is a placeholder in /keys/supabase_anon_key.txt');
+      }
+    } catch (err) {
+      console.error('Auth Module: Could not fetch Supabase anon key from /keys/', err);
+    }
+  })();
+
+  return _supabaseInitPromise;
 }
 
 /**
- * Creates a mock JWT token from user data.
- * Format: lum_[base64(user)]_[timestamp]
- * @param {Object} userObject - The user object containing name and email
- * @param {string} userObject.name - User's full name
- * @param {string} userObject.email - User's email
- * @returns {string} A fake JWT-style token string
- */
-function mockJWT(userObject) {
-  const payloadString = JSON.stringify({
-    name: userObject.name,
-    email: userObject.email,
-  });
-  const base64Payload = btoa(payloadString);
-  const timestamp = Date.now();
-  return `lum_${base64Payload}_${timestamp}`;
-}
-
-/**
- * Saves a user session to localStorage.
- * Stores token, name, email, and login time.
- * @param {Object} userObject - The user data to persist
- * @param {string} userObject.name - User's full name
- * @param {string} userObject.email - User's email
- * @returns {void}
+ * Saves a user session (Legacy compatibility wrapper, Supabase does this automatically)
  */
 function saveSession(userObject) {
-  const token = mockJWT(userObject);
-  const sessionData = {
-    token: token,
-    name: userObject.name,
-    email: userObject.email,
-    loginTime: new Date().toISOString(),
+  // Supabase persists the session automatically in localStorage.
+  // We keep this for backward compatibility if needed.
+}
+
+/**
+ * Retrieves the current session from Supabase local storage asynchronously
+ * @returns {Promise<Object|null>}
+ */
+async function getSession() {
+  if (!supabase) return null;
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session) return null;
+  
+  return {
+    token: session.access_token,
+    name: session.user.user_metadata.full_name || session.user.email,
+    email: session.user.email,
+    loginTime: session.user.created_at
   };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
 }
 
 /**
- * Retrieves the current session from localStorage.
- * @returns {Object|null} Parsed session object or null if not found
+ * Retrieves synchronous session (Warning: may be null on initial load before Supabase resolves)
  */
-function getSession() {
-  const rawSession = localStorage.getItem(SESSION_KEY);
-  if (!rawSession) {
-    return null;
+function getSyncSession() {
+  const sessionStr = localStorage.getItem('sb-lbinyquyfxdfcckcyskl-auth-token');
+  if (sessionStr) {
+    try {
+      const sbSession = JSON.parse(sessionStr);
+      return {
+        name: sbSession.user.user_metadata?.full_name || sbSession.user.email,
+        email: sbSession.user.email
+      };
+    } catch(e) {
+      return null;
+    }
   }
-  try {
-    return JSON.parse(rawSession);
-  } catch (parseError) {
-    console.error('Failed to parse session data:', parseError);
-    return null;
-  }
+  return null;
 }
 
 /**
- * Clears the current session from localStorage.
- * Also clears any conversation data.
- * @returns {void}
+ * Clears the current session from Supabase
  */
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
+async function clearSession() {
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
 }
 
 /**
- * Checks if a user is currently logged in.
- * @returns {boolean} True if a valid session exists
+ * Checks if a user is currently logged in (Synchronous check for initial loads)
+ * @returns {boolean} True if a valid session exists in local storage
  */
 function isLoggedIn() {
-  const currentSession = getSession();
-  return currentSession !== null && currentSession.token !== undefined;
+  return localStorage.getItem('sb-lbinyquyfxdfcckcyskl-auth-token') !== null;
 }
 
 /**
  * Redirects the user to chat.html if they are already logged in.
- * Intended for use on the login page.
- * @returns {void}
  */
 function redirectIfLoggedIn() {
   if (isLoggedIn()) {
@@ -101,8 +109,6 @@ function redirectIfLoggedIn() {
 
 /**
  * Redirects the user to login.html if they are not logged in.
- * Intended for use on protected pages like chat.html.
- * @returns {void}
  */
 function redirectIfGuest() {
   if (!isLoggedIn()) {
@@ -112,8 +118,6 @@ function redirectIfGuest() {
 
 /**
  * Validates an email address format using a regex pattern.
- * @param {string} emailAddress - The email to validate
- * @returns {boolean} True if the email format is valid
  */
 function isValidEmail(emailAddress) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -122,12 +126,8 @@ function isValidEmail(emailAddress) {
 
 /**
  * Displays a toast notification.
- * @param {string} message - The message to display
- * @param {string} [type='info'] - Toast type: 'success', 'info', or 'error'
- * @returns {void}
  */
 function showToast(message, type = 'info') {
-  /* Remove any existing toast */
   const existingToast = document.querySelector('.toast-container');
   if (existingToast) {
     existingToast.remove();
@@ -143,25 +143,20 @@ function showToast(message, type = 'info') {
   toastContainer.appendChild(toastElement);
   document.body.appendChild(toastContainer);
 
-  /* Trigger animation after paint */
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       toastElement.classList.add('show');
     });
   });
 
-  /* Auto-dismiss after 3 seconds */
-  const dismissDelay = 3000;
   setTimeout(() => {
     toastElement.classList.remove('show');
     setTimeout(() => toastContainer.remove(), 300);
-  }, dismissDelay);
+  }, 3000);
 }
 
 /**
  * Initializes the starfield canvas background animation.
- * Creates twinkling dots on a <canvas id="starfield"> element.
- * @returns {void}
  */
 function initStarfield() {
   const canvas = document.getElementById('starfield');
@@ -171,17 +166,11 @@ function initStarfield() {
   let stars = [];
   const STAR_COUNT = 120;
 
-  /**
-   * Resizes canvas to fill the window.
-   */
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
 
-  /**
-   * Creates the star array with random positions, sizes, and speeds.
-   */
   function createStars() {
     stars = [];
     for (let i = 0; i < STAR_COUNT; i++) {
@@ -196,9 +185,6 @@ function initStarfield() {
     }
   }
 
-  /**
-   * Animation loop that draws and updates stars each frame.
-   */
   function animateStars() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 

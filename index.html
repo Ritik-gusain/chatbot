@@ -130,13 +130,15 @@
   <!-- ========= TOAST CONTAINER ========= -->
   <!-- (Toasts are dynamically injected by auth.js) -->
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js"></script>
   <script>
     /**
      * Landing page initialization.
      * Sets up the starfield and checks if user is already logged in.
      */
-    document.addEventListener('DOMContentLoaded', function initLandingPage() {
+    document.addEventListener('DOMContentLoaded', async function initLandingPage() {
+      await initSupabase();
       /* Initialize starfield background */
       initStarfield();
 
