@@ -1,17 +1,18 @@
 /**
  * =========================================================
- *  Luminescent.io — Supabase Auth Module
+ *  Luminescent.io - Supabase Auth Module
  *  Handles Supabase initialization, auth flows, and session management
  * =========================================================
  */
+console.log("AUTH.JS: Script successfully parsed and executing. v3");
 
 /* Keys are fetched dynamically from the /keys directory */
-const SUPABASE_URL = 'https://lbinyquyfxdfcckcyskl.supabase.co';
-let supabase = null;
-let _supabaseInitPromise = null;
+window.SUPABASE_URL = 'https://lbinyquyfxdfcckcyskl.supabase.co';
+window.supabaseClient = null;
+window._supabaseInitPromise = null;
 
-async function initSupabase() {
-  if (_supabaseInitPromise) return _supabaseInitPromise;
+window.initSupabase = async function initSupabase() {
+  if (window._supabaseInitPromise) return window._supabaseInitPromise;
   
   _supabaseInitPromise = (async () => {
     if (typeof window.supabase === 'undefined') {
@@ -25,7 +26,7 @@ async function initSupabase() {
       const anonKey = (await response.text()).trim();
       
       if (anonKey && !anonKey.includes('YOUR_SUPABASE')) {
-        supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
+        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, anonKey);
       } else {
         console.warn('Supabase key is a placeholder in /keys/supabase_anon_key.txt');
       }
@@ -34,7 +35,7 @@ async function initSupabase() {
     }
   })();
 
-  return _supabaseInitPromise;
+  return window._supabaseInitPromise;
 }
 
 /**
@@ -49,9 +50,9 @@ function saveSession(userObject) {
  * Retrieves the current session from Supabase local storage asynchronously
  * @returns {Promise<Object|null>}
  */
-async function getSession() {
-  if (!supabase) return null;
-  const { data: { session }, error } = await supabase.auth.getSession();
+window.getSession = async function getSession() {
+  if (!window.supabaseClient) return null;
+  const { data: { session }, error } = await window.supabaseClient.auth.getSession();
   if (error || !session) return null;
   
   return {
@@ -65,7 +66,7 @@ async function getSession() {
 /**
  * Retrieves synchronous session (Warning: may be null on initial load before Supabase resolves)
  */
-function getSyncSession() {
+window.getSyncSession = function getSyncSession() {
   const sessionStr = localStorage.getItem('sb-lbinyquyfxdfcckcyskl-auth-token');
   if (sessionStr) {
     try {
@@ -84,9 +85,9 @@ function getSyncSession() {
 /**
  * Clears the current session from Supabase
  */
-async function clearSession() {
-  if (supabase) {
-    await supabase.auth.signOut();
+window.clearSession = async function clearSession() {
+  if (window.supabaseClient) {
+    await window.supabaseClient.auth.signOut();
   }
 }
 
@@ -94,15 +95,15 @@ async function clearSession() {
  * Checks if a user is currently logged in (Synchronous check for initial loads)
  * @returns {boolean} True if a valid session exists in local storage
  */
-function isLoggedIn() {
+window.isLoggedIn = function isLoggedIn() {
   return localStorage.getItem('sb-lbinyquyfxdfcckcyskl-auth-token') !== null;
 }
 
 /**
  * Redirects the user to chat.html if they are already logged in.
  */
-function redirectIfLoggedIn() {
-  if (isLoggedIn()) {
+window.redirectIfLoggedIn = function redirectIfLoggedIn() {
+  if (window.isLoggedIn()) {
     window.location.href = 'chat.html';
   }
 }
@@ -110,8 +111,8 @@ function redirectIfLoggedIn() {
 /**
  * Redirects the user to login.html if they are not logged in.
  */
-function redirectIfGuest() {
-  if (!isLoggedIn()) {
+window.redirectIfGuest = function redirectIfGuest() {
+  if (!window.isLoggedIn()) {
     window.location.href = 'login.html';
   }
 }
@@ -119,7 +120,7 @@ function redirectIfGuest() {
 /**
  * Validates an email address format using a regex pattern.
  */
-function isValidEmail(emailAddress) {
+window.isValidEmail = function isValidEmail(emailAddress) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(emailAddress);
 }
@@ -127,7 +128,7 @@ function isValidEmail(emailAddress) {
 /**
  * Displays a toast notification.
  */
-function showToast(message, type = 'info') {
+window.showToast = function showToast(message, type = 'info') {
   const existingToast = document.querySelector('.toast-container');
   if (existingToast) {
     existingToast.remove();
@@ -158,7 +159,7 @@ function showToast(message, type = 'info') {
 /**
  * Initializes the starfield canvas background animation.
  */
-function initStarfield() {
+window.initStarfield = function initStarfield() {
   const canvas = document.getElementById('starfield');
   if (!canvas) return;
 

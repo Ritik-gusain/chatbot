@@ -136,7 +136,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/auth.js?v=2"></script>
+  <script src="assets/js/auth.js?v=4"></script>
   <script>
     /**
      * =========================================================
@@ -271,14 +271,14 @@
         loginSubmitBtn.textContent = 'Signing in...';
         loginSubmitBtn.disabled = true;
 
-        if (!supabase) {
+        if (!window.supabaseClient) {
           showToast('Supabase Anon Key is missing in auth.js', 'error');
           loginSubmitBtn.textContent = 'Sign In';
           loginSubmitBtn.disabled = false;
           return;
         }
 
-        supabase.auth.signInWithPassword({ email, password }).then(({ data, error }) => {
+        window.supabaseClient.auth.signInWithPassword({ email, password }).then(({ data, error }) => {
           loginSubmitBtn.textContent = 'Sign In';
           loginSubmitBtn.disabled = false;
 
@@ -329,14 +329,14 @@
         registerSubmitBtn.textContent = 'Creating...';
         registerSubmitBtn.disabled = true;
 
-        if (!supabase) {
+        if (!window.supabaseClient) {
           showToast('Supabase Anon Key is missing in auth.js', 'error');
           registerSubmitBtn.textContent = 'Create Account';
           registerSubmitBtn.disabled = false;
           return;
         }
 
-        supabase.auth.signUp({
+        window.supabaseClient.auth.signUp({
           email: email,
           password: password,
           options: { data: { full_name: name } }
@@ -454,7 +454,7 @@
       verifyBtn.textContent = 'Verifying...';
       verifyBtn.disabled = true;
 
-      supabase.auth.verifyOtp({
+      window.supabaseClient.auth.verifyOtp({
         email: pendingUserEmail,
         token: enteredOTP,
         type: 'signup'
