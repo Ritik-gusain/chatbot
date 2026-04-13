@@ -1,438 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Luminescent Scholar - Sign In">
-    <title>Sign In — Luminescent Scholar</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
-    <style>
-        :root {
-            --bg-main: #0d0d0d;
-            --bg-surface: #2a2a2a;
-            --text-1: #ececf1;
-            --text-2: #9a9aa6;
-            --text-3: #6b7280;
-            --accent: #10a37f;
-            --border-1: rgba(255,255,255,0.08);
-            --border-2: rgba(255,255,255,0.12);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html {
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        body {
-            font-family: var(--font);
-            background: var(--bg-main);
-            color: var(--text-1);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .login-logo {
-            font-size: 32px;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: var(--text-1);
-            letter-spacing: -0.02em;
-        }
-
-        .login-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-1);
-            margin-bottom: 8px;
-            letter-spacing: -0.01em;
-        }
-
-        .login-subtitle {
-            font-size: 14px;
-            color: var(--text-2);
-            line-height: 1.5;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-1);
-        }
-
-        .form-input {
-            padding: 10px 14px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-2);
-            border-radius: 8px;
-            color: var(--text-1);
-            font-family: var(--font);
-            font-size: 14px;
-            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-3);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: var(--bg-surface);
-            box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.1);
-        }
-
-        .form-input:hover {
-            border-color: var(--border-1);
-        }
-
-        .form-remember {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-2);
-        }
-
-        .form-checkbox {
-            width: 16px;
-            height: 16px;
-            border: 1px solid var(--border-2);
-            border-radius: 4px;
-            cursor: pointer;
-            appearance: none;
-            background: transparent;
-            transition: all 150ms;
-        }
-
-        .form-checkbox:checked {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .form-checkbox:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.2);
-        }
-
-        .login-btn {
-            padding: 10px 16px;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: var(--font);
-            transition: all 150ms;
-            margin-top: 8px;
-        }
-
-        .login-btn:hover {
-            opacity: 0.9;
-        }
-
-        .login-btn:active {
-            transform: scale(0.98);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .login-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 24px 0;
-            color: var(--text-3);
-            font-size: 13px;
-        }
-
-        .login-divider::before,
-        .login-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border-1);
-        }
-
-        .login-social {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .social-btn {
-            padding: 10px 14px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-2);
-            border-radius: 8px;
-            color: var(--text-1);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: var(--font);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 150ms;
-        }
-
-        .social-btn:hover {
-            background: linear-gradient(135deg, rgba(16, 163, 127, 0.08), rgba(16, 163, 127, 0.05));
-            border-color: var(--accent);
-        }
-
-        .social-icon {
-            font-size: 16px;
-        }
-
-        .login-footer {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-2);
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-1);
-        }
-
-        .login-footer a {
-            color: var(--accent);
-            text-decoration: none;
-            transition: opacity 150ms;
-        }
-
-        .login-footer a:hover {
-            opacity: 0.8;
-        }
-
-        .signup-link {
-            text-align: center;
-            font-size: 13px;
-            margin-top: 16px;
-            color: var(--text-2);
-        }
-
-        .signup-link a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .error-message {
-            padding: 10px 12px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 6px;
-            color: #fca5a5;
-            font-size: 13px;
-            display: none;
-            margin-bottom: 16px;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--bg-surface);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-3);
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                max-width: 100%;
-            }
-
-            .login-title {
-                font-size: 20px;
-            }
-
-            .social-btn {
-                font-size: 12px;
-                padding: 9px 12px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luminescent.io — Login</title>
+  <meta name="description" content="Sign in or create your Luminescent.io account to access the AI chatbot.">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="login-logo">✨</div>
-            <h1 class="login-title">Welcome Back</h1>
-            <p class="login-subtitle">Sign in to access your conversations and continue learning</p>
+
+  <!-- ========= STARFIELD BACKGROUND ========= -->
+  <canvas id="starfield"></canvas>
+
+  <!-- ========= BACKGROUND ORBS ========= -->
+  <div class="bg-orbs">
+    <div class="bg-orb bg-orb--cyan"></div>
+    <div class="bg-orb bg-orb--purple"></div>
+    <div class="bg-orb bg-orb--pink"></div>
+  </div>
+
+  <!-- ========= BACK LINK ========= -->
+  <a href="index.html" class="auth-back-link" id="backToHome">
+    ← Back to Home
+  </a>
+
+  <!-- ========= AUTH PAGE ========= -->
+  <div class="auth-page" id="authPage">
+    <div class="glass-card auth-card" id="authCard">
+
+      <!-- ========= AUTH LOGO ========= -->
+      <div class="auth-logo">
+        <span class="logo-dot"></span>
+        Luminescent.io
+      </div>
+
+      <!-- ========= AUTH TABS ========= -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" id="tabLogin" data-tab="login">Login</button>
+        <button class="auth-tab" id="tabRegister" data-tab="register">Register</button>
+      </div>
+
+      <!-- ========= LOGIN FORM ========= -->
+      <form class="auth-form" id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
+          <span class="form-error" id="loginEmailError"></span>
         </div>
 
-        <form class="login-form" id="loginForm">
-            <div class="error-message" id="errorMessage"></div>
-
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input
-                    type="email"
-                    id="email"
-                    class="form-input"
-                    placeholder="you@example.com"
-                    required
-                    autocomplete="email"
-                />
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    class="form-input"
-                    placeholder="••••••••"
-                    required
-                    autocomplete="current-password"
-                />
-            </div>
-
-            <div class="form-remember">
-                <input type="checkbox" id="remember" class="form-checkbox" />
-                <label for="remember" style="cursor: pointer;">Keep me signed in</label>
-            </div>
-
-            <button type="submit" class="login-btn">Sign In</button>
-        </form>
-
-        <div class="login-divider">or continue with</div>
-
-        <div class="login-social">
-            <button type="button" class="social-btn" onclick="handleSocialLogin('google')">
-                <span class="social-icon">🔵</span>
-                <span>Google</span>
-            </button>
-            <button type="button" class="social-btn" onclick="handleSocialLogin('github')">
-                <span class="social-icon">⚫</span>
-                <span>GitHub</span>
-            </button>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+          <span class="form-error" id="loginPasswordError"></span>
         </div>
 
-        <div class="login-footer">
-            <a href="#forgot">Forgot your password?</a> · <a href="#terms">Terms of Service</a>
+        <button type="submit" class="btn-primary" id="loginSubmitBtn" style="width: 100%; margin-top: 4px;">
+          Sign In
+        </button>
+
+        <div class="auth-divider">or</div>
+
+        <button type="button" class="btn-google" id="googleLoginBtn">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </form>
+
+      <!-- ========= REGISTER FORM ========= -->
+      <form class="auth-form" id="registerForm" style="display: none;" autocomplete="off">
+        <div class="form-group">
+          <label class="form-label" for="registerName">Full Name</label>
+          <input type="text" class="form-input" id="registerName" placeholder="John Doe" required>
+          <span class="form-error" id="registerNameError"></span>
         </div>
 
-        <div class="signup-link">
-            Don't have an account? <a href="#signup">Create one</a>
+        <div class="form-group">
+          <label class="form-label" for="registerEmail">Email</label>
+          <input type="email" class="form-input" id="registerEmail" placeholder="you@example.com" required>
+          <span class="form-error" id="registerEmailError"></span>
         </div>
+
+        <div class="form-group">
+          <label class="form-label" for="registerPassword">Password</label>
+          <input type="password" class="form-input" id="registerPassword" placeholder="••••••••" required>
+          <span class="form-error" id="registerPasswordError"></span>
+        </div>
+
+        <button type="submit" class="btn-primary" id="registerSubmitBtn" style="width: 100%; margin-top: 4px;">
+          Create Account
+        </button>
+
+        <div class="auth-divider">or</div>
+
+        <button type="button" class="btn-google" id="googleRegisterBtn">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </form>
+
+      <!-- ========= OTP VERIFICATION ========= -->
+      <div class="otp-section" id="otpSection">
+        <div class="otp-demo-box" id="otpDemoBox">
+          <div class="otp-demo-label">Demo Mode: OTP shown here</div>
+          <div class="otp-demo-code" id="otpDisplayCode">------</div>
+        </div>
+
+        <label class="form-label" style="text-align: center;">Enter the 6-digit verification code</label>
+        <div class="otp-input-wrapper" id="otpInputWrapper">
+          <input type="text" class="otp-digit" maxlength="1" data-index="0" id="otpDigit0" inputmode="numeric">
+          <input type="text" class="otp-digit" maxlength="1" data-index="1" id="otpDigit1" inputmode="numeric">
+          <input type="text" class="otp-digit" maxlength="1" data-index="2" id="otpDigit2" inputmode="numeric">
+          <input type="text" class="otp-digit" maxlength="1" data-index="3" id="otpDigit3" inputmode="numeric">
+          <input type="text" class="otp-digit" maxlength="1" data-index="4" id="otpDigit4" inputmode="numeric">
+          <input type="text" class="otp-digit" maxlength="1" data-index="5" id="otpDigit5" inputmode="numeric">
+        </div>
+        <span class="form-error" id="otpError" style="text-align: center;"></span>
+
+        <button type="button" class="btn-primary" id="verifyOtpBtn" style="width: 100%;">
+          Verify & Continue
+        </button>
+      </div>
+
     </div>
+  </div>
 
-    <script>
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
+  <script src="assets/js/auth.js"></script>
+  <script>
+    /**
+     * =========================================================
+     *  Login Page Controller
+     *  Handles tab switching, form validation, OTP flow
+     * =========================================================
+     */
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMessage.classList.remove('show');
+    /** @type {string|null} The generated OTP for the current session */
+    let currentOTP = null;
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+    /** @type {Object|null} Pending user data waiting for OTP verification */
+    let pendingUser = null;
 
-            if (!email || !password) {
-                showError('Please fill in all fields');
-                return;
-            }
+    /**
+     * Initializes the login page on DOM load.
+     */
+    document.addEventListener('DOMContentLoaded', function initLoginPage() {
+      /* Initialize starfield */
+      initStarfield();
 
-            if (!email.includes('@')) {
-                showError('Please enter a valid email address');
-                return;
-            }
+      /* Redirect if already logged in */
+      redirectIfLoggedIn();
 
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters');
-                return;
-            }
+      /* Check URL params for mode */
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      if (mode === 'register') {
+        switchTab('register');
+      }
 
-            // Simulate login
-            try {
-                const btn = loginForm.querySelector('.login-btn');
-                btn.disabled = true;
-                btn.textContent = 'Signing in...';
+      /* Set up tab switching */
+      setupTabs();
 
-                // Simulate API call delay
-                await new Promise(resolve => setTimeout(resolve, 1500));
+      /* Set up form submissions */
+      setupForms();
 
-                // Mock successful login - redirect to chat
-                window.location.href = 'index.html';
-            } catch (error) {
-                showError('An error occurred. Please try again.');
-                const btn = loginForm.querySelector('.login-btn');
-                btn.disabled = false;
-                btn.textContent = 'Sign In';
-            }
+      /* Set up OTP inputs */
+      setupOTPInputs();
+
+      /* Google OAuth buttons */
+      setupGoogleButtons();
+    });
+
+    /**
+     * Sets up tab click handlers for Login/Register toggle.
+     * @returns {void}
+     */
+    function setupTabs() {
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+
+      tabLogin.addEventListener('click', function() { switchTab('login'); });
+      tabRegister.addEventListener('click', function() { switchTab('register'); });
+    }
+
+    /**
+     * Switches the active tab between login and register.
+     * @param {'login'|'register'} tabName - The tab to activate
+     * @returns {void}
+     */
+    function switchTab(tabName) {
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const otpSection = document.getElementById('otpSection');
+
+      /* Reset OTP state */
+      otpSection.classList.remove('active');
+      currentOTP = null;
+      pendingUser = null;
+
+      /* Clear errors */
+      clearAllErrors();
+
+      if (tabName === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.style.display = 'flex';
+        registerForm.style.display = 'none';
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.style.display = 'flex';
+        loginForm.style.display = 'none';
+      }
+    }
+
+    /**
+     * Sets up form submit event listeners.
+     * @returns {void}
+     */
+    function setupForms() {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+
+      loginForm.addEventListener('submit', function handleLoginSubmit(event) {
+        event.preventDefault();
+        clearAllErrors();
+
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+
+        /* Validation */
+        let hasError = false;
+
+        if (!email) {
+          showFieldError('loginEmailError', 'Email is required');
+          hasError = true;
+        } else if (!isValidEmail(email)) {
+          showFieldError('loginEmailError', 'Please enter a valid email');
+          hasError = true;
+        }
+
+        if (!password) {
+          showFieldError('loginPasswordError', 'Password is required');
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        /* Generate OTP and show verification */
+        pendingUser = { name: email.split('@')[0], email: email };
+        initiateOTPVerification();
+      });
+
+      registerForm.addEventListener('submit', function handleRegisterSubmit(event) {
+        event.preventDefault();
+        clearAllErrors();
+
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
+
+        /* Validation */
+        let hasError = false;
+
+        if (!name) {
+          showFieldError('registerNameError', 'Full name is required');
+          hasError = true;
+        }
+
+        if (!email) {
+          showFieldError('registerEmailError', 'Email is required');
+          hasError = true;
+        } else if (!isValidEmail(email)) {
+          showFieldError('registerEmailError', 'Please enter a valid email');
+          hasError = true;
+        }
+
+        if (!password) {
+          showFieldError('registerPasswordError', 'Password is required');
+          hasError = true;
+        } else if (password.length < 6) {
+          showFieldError('registerPasswordError', 'Password must be at least 6 characters');
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        /* Generate OTP and show verification */
+        pendingUser = { name: name, email: email };
+        initiateOTPVerification();
+      });
+    }
+
+    /**
+     * Generates OTP and switches to the OTP verification view.
+     * @returns {void}
+     */
+    function initiateOTPVerification() {
+      currentOTP = generateOTP();
+
+      /* Hide forms, show OTP section */
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('authTabs').style.display = 'none';
+
+      const otpSection = document.getElementById('otpSection');
+      otpSection.classList.add('active');
+
+      /* Show the OTP code in the demo box */
+      document.getElementById('otpDisplayCode').textContent = currentOTP;
+
+      /* Focus the first OTP input */
+      document.getElementById('otpDigit0').focus();
+
+      showToast('OTP generated! Enter it below to continue.', 'success');
+    }
+
+    /**
+     * Sets up keyboard navigation and auto-focus for OTP digit inputs.
+     * @returns {void}
+     */
+    function setupOTPInputs() {
+      const otpDigits = document.querySelectorAll('.otp-digit');
+
+      otpDigits.forEach(function(digitInput, index) {
+        digitInput.addEventListener('input', function handleOTPInput(event) {
+          const value = event.target.value;
+
+          /* Only allow digits */
+          event.target.value = value.replace(/[^0-9]/g, '');
+
+          /* Auto-focus next input */
+          if (event.target.value && index < 5) {
+            otpDigits[index + 1].focus();
+          }
         });
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.add('show');
-        }
+        digitInput.addEventListener('keydown', function handleOTPKeydown(event) {
+          /* Backspace navigates to previous input */
+          if (event.key === 'Backspace' && !event.target.value && index > 0) {
+            otpDigits[index - 1].focus();
+          }
 
-        function handleSocialLogin(provider) {
-            console.log(`Logging in with ${provider}`);
-            // Simulate social login
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-        }
+          /* Enter triggers verification */
+          if (event.key === 'Enter') {
+            verifyOTP();
+          }
+        });
 
-        // Demo mode: auto-fill credentials
-        if (location.search.includes('demo=true')) {
-            document.getElementById('email').value = 'demo@example.com';
-            document.getElementById('password').value = 'password123';
+        /* Handle paste */
+        digitInput.addEventListener('paste', function handleOTPPaste(event) {
+          event.preventDefault();
+          const pastedData = event.clipboardData.getData('text').replace(/[^0-9]/g, '');
+          for (let i = 0; i < Math.min(pastedData.length, 6); i++) {
+            otpDigits[i].value = pastedData[i];
+          }
+          const focusIndex = Math.min(pastedData.length, 5);
+          otpDigits[focusIndex].focus();
+        });
+      });
+
+      /* Verify button */
+      document.getElementById('verifyOtpBtn').addEventListener('click', verifyOTP);
+    }
+
+    /**
+     * Verifies the entered OTP against the generated one.
+     * On success: saves session and redirects to chat.html.
+     * @returns {void}
+     */
+    function verifyOTP() {
+      const otpDigits = document.querySelectorAll('.otp-digit');
+      let enteredOTP = '';
+      otpDigits.forEach(function(digit) {
+        enteredOTP += digit.value;
+      });
+
+      const otpErrorField = document.getElementById('otpError');
+
+      if (enteredOTP.length !== 6) {
+        otpErrorField.textContent = 'Please enter all 6 digits';
+        return;
+      }
+
+      if (enteredOTP !== currentOTP) {
+        otpErrorField.textContent = 'Invalid OTP. Please try again.';
+        showToast('Incorrect OTP!', 'error');
+        return;
+      }
+
+      /* Success — save session and redirect */
+      otpErrorField.textContent = '';
+      saveSession(pendingUser);
+      showToast('Verification successful! Redirecting...', 'success');
+
+      setTimeout(function() {
+        window.location.href = 'chat.html';
+      }, 800);
+    }
+
+    /**
+     * Shows an error message for a specific form field.
+     * @param {string} errorElementId - The ID of the error span element
+     * @param {string} errorMessage - The error message to display
+     * @returns {void}
+     */
+    function showFieldError(errorElementId, errorMessage) {
+      const errorElement = document.getElementById(errorElementId);
+      if (errorElement) {
+        errorElement.textContent = errorMessage;
+      }
+    }
+
+    /**
+     * Clears all form error messages.
+     * @returns {void}
+     */
+    function clearAllErrors() {
+      const allErrors = document.querySelectorAll('.form-error');
+      allErrors.forEach(function(errorEl) {
+        errorEl.textContent = '';
+      });
+    }
+
+    /**
+     * Sets up Google OAuth button click handlers (UI-only).
+     * @returns {void}
+     */
+    function setupGoogleButtons() {
+      const googleBtns = [
+        document.getElementById('googleLoginBtn'),
+        document.getElementById('googleRegisterBtn'),
+      ];
+
+      googleBtns.forEach(function(btn) {
+        if (btn) {
+          btn.addEventListener('click', function handleGoogleClick() {
+            showToast('Google OAuth coming soon!', 'info');
+          });
         }
-    </script>
+      });
+    }
+  </script>
 </body>
 </html>
