@@ -2,7 +2,7 @@
 
 An advanced Streamlit app that demonstrates building a sophisticated chatbot using Bytez AI's SDK with customizable settings, model selection, and chat management features.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://chatbot-template.streamlit.app/)
+[![Open on vercel](https://chatbot-nine-psi-46.vercel.app/)
 
 ### Features
 
