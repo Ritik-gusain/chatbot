@@ -150,6 +150,8 @@ const elements = {
     welcomeScreen:     $('#welcomeScreen'),
     messagesContainer: $('#messagesContainer'),
     typingIndicator:   $('#typingIndicator'),
+    typingLabel:       $('#typingLabel'),
+    typingHint:        $('#typingHint'),
     messageInput:      $('#messageInput'),
     sendBtn:           $('#sendBtn'),
     charCount:         $('#charCount'),
@@ -533,6 +535,24 @@ async function getAIResponse(conv) {
     state.isGenerating = true;
     if (elements.sendBtn) elements.sendBtn.disabled = true;
     elements.typingIndicator.style.display = 'flex';
+
+    // Reset typing label
+    if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
+    if (elements.typingHint)  elements.typingHint.textContent = '';
+
+    // Cold-start hints — shown if the model takes too long (free tier spins up)
+    const coldStartTimer1 = setTimeout(() => {
+        if (elements.typingHint) {
+            elements.typingHint.textContent = '⏳ Model warming up on free tier, 10-30s…';
+        }
+    }, 8000);
+    const coldStartTimer2 = setTimeout(() => {
+        if (elements.typingLabel) elements.typingLabel.textContent = 'Still loading…';
+        if (elements.typingHint) {
+            elements.typingHint.textContent = '🧊 Cold start — switch to Llama 3.2 3B for faster responses';
+        }
+    }, 22000);
+
     scrollToBottom();
 
     const systemPromptText = (elements.systemPrompt && elements.systemPrompt.value.trim())
@@ -596,11 +616,15 @@ Keep responses focused and avoid unnecessary padding. Never truncate your respon
 
     } catch (err) {
         console.error('[Scholar] API error:', err);
+        clearTimeout(coldStartTimer1);
+        clearTimeout(coldStartTimer2);
         elements.typingIndicator.style.display = 'none';
+        if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
+        if (elements.typingHint)  elements.typingHint.textContent = '';
 
         const errMsg = {
             role: 'assistant',
-            content: `⚠️ **Could not reach Scholar**\n\n\`\`\`\n${err.message}\n\`\`\`\n\n**Tips:** Check your internet connection, or the API key may need refreshing at [bytez.com](https://bytez.com).`,
+            content: `⚠️ **Could not reach Scholar**\n\n\`\`\`\n${err.message}\n\`\`\`\n\n**Tips:** The free-tier model may have timed out. Try switching to a faster model like **Llama 3.2 3B** from the sidebar.`,
             timestamp: new Date().toISOString(),
         };
         conv.messages.push(errMsg);
@@ -608,6 +632,10 @@ Keep responses focused and avoid unnecessary padding. Never truncate your respon
         saveState();
         appendMessageToDOM(errMsg, true);
     } finally {
+        clearTimeout(coldStartTimer1);
+        clearTimeout(coldStartTimer2);
+        if (elements.typingLabel) elements.typingLabel.textContent = 'Scholar is thinking';
+        if (elements.typingHint)  elements.typingHint.textContent = '';
         state.isGenerating = false;
         if (elements.sendBtn) elements.sendBtn.disabled = elements.messageInput.value.trim().length === 0;
     }
