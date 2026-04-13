@@ -4,7 +4,11 @@
    ================================================ */
 
 // ===== API Key =====
-const BYTEZ_API_KEY = '\keys\bytez_api_key.txt';
+let BYTEZ_API_KEY = '';
+fetch('../keys/bytez_api_key.txt')
+    .then(res => res.text())
+    .then(key => { BYTEZ_API_KEY = key.trim(); })
+    .catch(err => console.error("Could not load Bytez API key.", err));
 
 // ===== Free-tier Chat Models (Bytez) =====
 const FREE_CHAT_MODELS = [
