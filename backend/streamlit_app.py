@@ -242,7 +242,7 @@ with col1:
 
 # Load Bytez API key
 KEY_FILE = os.path.join("keys", "bytez_api_key.txt")
-bytez_api_key = "510034cf57f565ca955e871952bf486d" # Default key provided
+bytez_api_key = "" # Please retrieve key from keys/bytez_api_key.txt
 
 if os.path.exists(KEY_FILE):
     with open(KEY_FILE, "r") as f:
