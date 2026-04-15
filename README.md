@@ -20,6 +20,37 @@ per-seat pricing nonsense.
 
 ---
 
+## Features
+
+✨ **Modern SaaS Experience**
+- Premium dark theme with glassmorphism design
+- Responsive mobile-first layout (hamburger menu at 768px)
+- Smooth animations and interactive components
+
+🔐 **Secure Authentication**
+- Email/password signup and login
+- OTP email verification
+- Google OAuth support
+- Session management via Supabase
+
+🤖 **Intelligent AI**
+- Powered by Anthropic Claude (Haiku/Sonnet)
+- Real-time streaming responses
+- Customizable system prompts
+- Usage tracking and limits
+
+💾 **Persistent Conversations**
+- Chat history saved to localStorage
+- View/restore past conversations
+- Export chat sessions
+
+📱 **Responsive Design**
+- Works on desktop, tablet, mobile
+- Sidebar toggles on small screens
+- Touch-friendly inputs
+
+---
+
 ## Tech stack
 
 | Layer        | Technology                        |
@@ -36,17 +67,26 @@ per-seat pricing nonsense.
 
 ```
 /
-├── index.html          # Landing page (pricing, hero)
-├── login.html          # Login + Register + OTP verification
-├── chat.html           # Main chat workspace
-├── api/
-│   └── chat.js         # Vercel serverless function — AI proxy
+├── index.html              # Landing page (hero, features, pricing, testimonials)
+├── login.html              # Auth page (login, register, OTP verification)
+├── chat.html               # Workspace (sidebar, chat area, model selector)
 ├── assets/
-│   ├── css/styles.css  # All styles (dark space aesthetic)
+│   ├── css/
+│   │   └── styles.css      # Old UI styles (used by login.html)
 │   └── js/
-│       ├── auth.js     # Supabase auth helpers
-│       └── chat.js     # Chat UI + conversation history
-├── vercel.json         # Deployment config + security headers
+│       ├── auth.js         # Supabase auth helpers + SDK init
+│       └── chat.js         # Chat UI + conversation history
+├── api/                    # (Create for Vercel deployment)
+│   └── chat.js             # Serverless function — AI proxy to Anthropic
+├── backend/                # (Python Streamlit app — optional)
+│   ├── streamlit_app.py
+│   ├── chat_history.json
+│   └── requirements.txt
+├── keys/                   # API keys (gitignored)
+│   ├── supabase_anon_key.txt
+│   └── bytez_api_key.txt
+├── vercel.json             # Deployment config
+├── structure.md            # Project documentation
 └── README.md
 ```
 
@@ -56,37 +96,37 @@ per-seat pricing nonsense.
 
 ### Prerequisites
 
-- Node.js 18+
-- A [Supabase](https://supabase.com) project
-- An [Anthropic](https://console.anthropic.com) API key
+- A [Supabase](https://supabase.com) project (free tier OK)
+- An [Anthropic](https://console.anthropic.com) API key (paid account required)
+- Vercel CLI (for local serverless function testing)
 
-### 1. Clone and install
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/Ritik-gusain/chatbot
 cd chatbot
-npm install @anthropic-ai/sdk
 ```
 
-### 2. Set up Supabase keys
+### 2. Store your Supabase anon key
 
-Create `keys/supabase_anon_key.txt` with your Supabase anon key.
-This file is gitignored — never commit it.
+The Supabase anon key is public and safe to store as a file (it's also visible in client-side auth.js).
 
 ```bash
 echo "your-supabase-anon-key" > keys/supabase_anon_key.txt
 ```
 
-### 3. Create a `.env` file for local dev
+This file is gitignored — never commit it.
 
-```env
-ANTHROPIC_API_KEY=sk-ant-...
+### 3. Create serverless function for local dev
+
+Since the AI endpoint (`/api/chat`) needs a backend, create the function locally:
+
+```bash
+mkdir -p api
+# Create api/chat.js with your Anthropic integration
 ```
 
-### 4. Run locally with Vercel CLI (recommended)
-
-The AI endpoint (`/api/chat`) requires a server. Use Vercel CLI to run both the
-static site and the serverless function locally:
+Or use Vercel CLI to test:
 
 ```bash
 npm install -g vercel
@@ -94,51 +134,148 @@ vercel dev
 # → http://localhost:3000
 ```
 
-**Do NOT open HTML files directly** (`file://`) — the Supabase key fetch and
-the `/api/chat` endpoint both require an HTTP server.
+**Important:** Do NOT open HTML files directly (`file://`). The project requires an HTTP server for:
+- Supabase authentication flows
+- `/api/chat` endpoint for AI responses
+
+### 4. Test locally
+
+Open `http://localhost:3000` and test the flow:
+1. **index.html** — Landing page
+2. **login.html** → Sign up / Login with Supabase
+3. **chat.html** → Send messages (needs `/api/chat` or will show friendly error)
 
 ---
 
 ## Deployment to Vercel
 
-1. Push to GitHub
-2. Connect the repo in [Vercel Dashboard](https://vercel.com/new)
-3. Add environment variables:
+### 1. Push to GitHub
 
-| Variable             | Value                          |
-|----------------------|--------------------------------|
-| `ANTHROPIC_API_KEY`  | `sk-ant-...`                   |
-| `ALLOWED_ORIGIN`     | `https://your-domain.vercel.app` |
+```bash
+git push origin main
+```
 
-4. Deploy — Vercel auto-detects `api/chat.js` as a serverless function.
+### 2. Connect to Vercel
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repository
+3. Add environment variable:
+
+| Variable             | Value          |
+|----------------------|----------------|
+| `ANTHROPIC_API_KEY`  | `sk-ant-...`   |
+
+### 3. Create the serverless function
+
+Create `api/chat.js` in your repo:
+
+```javascript
+import Anthropic from '@anthropic-ai/sdk';
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'POST only' });
+  }
+
+  const { messages, systemPrompt, model } = req.body;
+
+  try {
+    const client = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY
+    });
+
+    const response = await client.messages.create({
+      model: model === 'haiku' ? 'claude-3-5-haiku-20241022' : 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages
+    });
+
+    res.status(200).json({ 
+      reply: response.content[0].type === 'text' ? response.content[0].text : 'No response'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+```
+
+### 4. Deploy
+
+Push your changes → Vercel auto-deploys → Live! 🚀
 
 ---
 
-## Supabase setup
+## Supabase Setup
 
-Enable **Email Auth** in Supabase → Authentication → Providers.
+### Create a Supabase project
 
-To enable Google OAuth (already wired in login.html):
-1. Supabase → Authentication → Providers → Google
-2. Add your Google OAuth credentials
-3. Set redirect URL to `https://your-domain.vercel.app/chat.html`
+1. Go to [supabase.com](https://supabase.com) → Sign up
+2. Create a new project (free tier works fine)
+3. Enable **Email Auth**:
+   - Authentication → Providers → Email
+   - Toggle **Email** on (enabled by default)
+4. (Optional) Enable **Google OAuth**:
+   - Providers → Google
+   - Add your Google OAuth credentials from Google Cloud Console
+   - Set redirect URL to: `https://your-domain.vercel.app/chat.html`
+
+### Add your Supabase keys to the project
+
+1. Copy your **Supabase URL** and **anon key** from Settings → API
+2. Save anon key to `keys/supabase_anon_key.txt`:
+   ```bash
+   echo "your-anon-key" > keys/supabase_anon_key.txt
+   ```
+3. Update `assets/js/auth.js` with your Supabase URL:
+   ```javascript
+   const SUPABASE_URL = 'https://your-project.supabase.co';
+   const SUPABASE_ANON_KEY = 'your-anon-key';
+   ```
 
 ---
 
-## Environment variables reference
+## Environment variables (Vercel only)
 
-| Variable            | Required | Description                              |
-|---------------------|----------|------------------------------------------|
-| `ANTHROPIC_API_KEY` | Yes      | Anthropic Claude API key                 |
-| `ALLOWED_ORIGIN`    | No       | CORS allowed origin (defaults to `*`)    |
+| Variable            | Required | Where | Description                    |
+|---------------------|----------|-------|--------------------------------|
+| `ANTHROPIC_API_KEY` | Yes      | Vercel | Anthropic Claude API key       |
+
+**Local development:** Use `keys/supabase_anon_key.txt` and direct env vars.
 
 ---
 
-## Roadmap
+## Roadmap / Future Features
 
-- [ ] Stripe billing + webhook handler
-- [ ] Supabase `organizations` + `members` tables
-- [ ] Team invitation system (email → OTP → join org)
-- [ ] Message quota enforcement (Redis counter)
-- [ ] Image generation (Flux / Stability AI)
-- [ ] Annual billing (2 months free)
+### Core Features
+- [x] Landing page with hero + features + pricing
+- [x] Email/password authentication
+- [x] OTP verification
+- [x] Chat interface with streaming responses
+- [x] Chat history persistence (localStorage)
+- [x] Model selector (Haiku / Sonnet)
+- [x] Usage tracking and display
+- [x] Responsive mobile design
+
+### Planned
+- [ ] Real user accounts + org management (Supabase tables)
+- [ ] Stripe billing integration + webhook handler
+- [ ] Team invitations (email-based)
+- [ ] Message quota enforcement
+- [ ] Image generation (Stability AI / Flux)
+- [ ] Export conversations (PDF / Markdown)
+- [ ] Dark mode toggle
+- [ ] Voice input / output
+- [ ] Custom AI model fine-tuning
+
+---
+
+## Support
+
+📧 Questions? Open an issue on [GitHub](https://github.com/Ritik-gusain/chatbot/issues)
+
+💬 Try the live version: [chatbot-nine-psi-46.vercel.app](https://chatbot-nine-psi-46.vercel.app/)
+
+---
+
+**Made with ❤️ by Ritik**
