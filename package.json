@@ -1,0 +1,16 @@
+{
+  "name": "luminescent-io",
+  "version": "1.0.0",
+  "description": "Team AI chatbot SaaS",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
