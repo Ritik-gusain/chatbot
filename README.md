@@ -2,7 +2,7 @@
 
 **The AI That Thinks With You** — a team-based AI chatbot SaaS.
 
-Live: [https://chatbot-nine-psi-46.vercel.app/](https://chatbot-nine-psi-46.vercel.app/)
+Live: 
 
 ---
 
