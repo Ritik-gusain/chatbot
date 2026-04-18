@@ -4,19 +4,6 @@
 
 Live: [chatbot-nine-psi-46.vercel.app](https://chatbot-nine-psi-46.vercel.app/)
 
----
-
-## What it is
-
-Luminescent.io is a shared AI workspace for small teams. Every team member gets access to the same AI brain under one flat monthly subscription — no per-seat pricing.
-
-| Plan     | Team size | Price/month |
-|----------|-----------|-------------|
-| Starter  | 3 members | $12         |
-| Growth   | 7 members | $21.50      |
-| Business | 12 members| $30         |
-
----
 
 ## Tech stack
 
