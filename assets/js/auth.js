@@ -100,20 +100,20 @@ window.isLoggedIn = function isLoggedIn() {
 }
 
 /**
- * Redirects the user to chat.html if they are already logged in.
+ * Redirects the user to index.html if they are already logged in.
  */
 window.redirectIfLoggedIn = function redirectIfLoggedIn() {
   if (window.isLoggedIn()) {
-    window.location.href = 'chat.html';
+    window.location.href = 'index.html';
   }
 }
 
 /**
- * Redirects the user to login.html if they are not logged in.
+ * Redirects the user to index.html if they are not logged in.
  */
 window.redirectIfGuest = function redirectIfGuest() {
   if (!window.isLoggedIn()) {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   }
 }
 
