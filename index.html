@@ -1,1243 +1,637 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luminescent — AI That Thinks With Your Team</title>
-    <meta name="description" content="Luminescent is the AI workspace for teams. Context-aware, blazing fast, and built for collaboration.">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- GSAP for Premium Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        accent: {
-                            purple: '#b66dff',
-                            cyan: '#00d4ff',
-                            pink: '#ff006e',
-                        }
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'gradient-x': 'gradient-x 15s ease infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        'gradient-x': {
-                            '0%, 100%': { 'background-position': '0% 50%' },
-                            '50%': { 'background-position': '100% 50%' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        /* Custom Premium Styles */
-        body {
-            background-color: #0a0a0f;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        /* Animated Mesh Gradient Background */
-        .mesh-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            background: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background-size: 200% 200%;
-            animation: gradient-shift 20s ease infinite;
-        }
-
-        @keyframes gradient-shift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Glassmorphism Utilities */
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .glass-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(182, 109, 255, 0.3);
-            box-shadow: 0 20px 60px -15px rgba(182, 109, 255, 0.2);
-        }
-
-        /* Gradient Text */
-        .text-gradient {
-            background: linear-gradient(135deg, #fff 0%, #a5f3fc 50%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .text-gradient-accent {
-            background: linear-gradient(135deg, #00d4ff 0%, #b66dff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0f;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Button Effects */
-        .btn-glow {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-glow::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-glow:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary-premium {
-            background: linear-gradient(135deg, #b66dff 0%, #00d4ff 100%);
-            box-shadow: 0 0 40px rgba(182, 109, 255, 0.3);
-        }
-
-        .btn-primary-premium:hover {
-            box-shadow: 0 0 60px rgba(182, 109, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        /* Starfield Canvas */
-        #starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Navigation Blur */
-        .nav-blur {
-            background: rgba(10, 10, 15, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* Pricing Toggle */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #b66dff;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background: linear-gradient(135deg, #b66dff 0%, #00d4ff 100%);
-        }
-
-        /* Feature Icon Animation */
-        .feature-icon-wrapper {
-            background: linear-gradient(135deg, rgba(182, 109, 255, 0.2) 0%, rgba(0, 212, 255, 0.2) 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .glass-card:hover .feature-icon-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            background: linear-gradient(135deg, rgba(182, 109, 255, 0.3) 0%, rgba(0, 212, 255, 0.3) 100%);
-        }
-
-        /* FAQ Accordion */
-        .faq-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        
-        .faq-item.active .faq-content {
-            max-height: 500px;
-        }
-        
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
-        }
-
-        /* Logo Carousel Animation */
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        
-        .logo-carousel {
-            animation: scroll 30s linear infinite;
-        }
-        
-        .logo-carousel:hover {
-            animation-play-state: paused;
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-
-        /* Selection Color */
-        ::selection {
-            background: rgba(182, 109, 255, 0.3);
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace — Luminescent.io</title>
+  <meta name="description" content="Your Luminescent.io AI workspace. Powerful conversations and data analysis.">
+  
+  <!-- Google Fonts: Inter (body) + Space Grotesk (display) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
-<body class="antialiased">
+<body>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      --text-primary: #f0f0f5;
+      --text-secondary: #b0b0bf;
+      --text-muted: #7a7a8e;
+      --cyan: #00f5ff;
+      --violet: #b66dff;
+      --pink: #ff6de1;
+      --bg-dark: #0a0b14;
+      --bg-overlay: rgba(15, 16, 30, 0.7);
+      --border: rgba(180, 109, 255, 0.2);
+      
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, #0a0b14 0%, #12131f 50%, #0f1220 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-    <!-- Animated Background -->
-    <div class="mesh-gradient"></div>
-    <canvas id="starfield"></canvas>
+    #workspace {
+      display: flex;
+      height: 100vh;
+      gap: 0;
+    }
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 top-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <a href="#" class="flex items-center gap-2 group">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
-                    </div>
-                    <span class="font-display font-bold text-xl tracking-tight text-white">
-                        Luminescent<span class="text-accent-cyan">.</span>
-                    </span>
-                </a>
+    /* ──────── SIDEBAR ──────── */
+    #sidebar {
+      width: 280px;
+      background: var(--bg-overlay);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#features" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Features</a>
-                    <a href="#how-it-works" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">How it Works</a>
-                    <a href="#pricing" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Pricing</a>
-                    <a href="#faq" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">FAQ</a>
-                </div>
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
 
-                <!-- CTA Buttons -->
-                <div class="hidden md:flex items-center gap-4">
-                    <a href="login.html" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Sign In</a>
-                    <a href="#pricing" class="btn-primary-premium px-6 py-2.5 rounded-full text-sm font-semibold text-white btn-glow">
-                        Start Free Trial
-                    </a>
-                </div>
+    .sidebar-header {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-                <!-- Mobile Menu Button -->
-                <button id="mobileMenuBtn" class="md:hidden text-white p-2">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-            </div>
+    .sidebar-logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      font-family: 'Space Grotesk', sans-serif;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .new-chat-btn {
+      margin: 12px 12px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.1), rgba(0, 245, 255, 0.05));
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .new-chat-btn:hover {
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.15), rgba(0, 245, 255, 0.1));
+      border-color: rgba(0, 245, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .chat-list { flex: 1; padding: 8px 8px; }
+    .chat-item {
+      padding: 10px 12px;
+      margin-bottom: 4px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chat-item:hover {
+      background: rgba(0, 245, 255, 0.05);
+      border-color: rgba(0, 245, 255, 0.2);
+      color: var(--text-primary);
+    }
+
+    .chat-item.active {
+      background: rgba(180, 109, 255, 0.1);
+      border-color: var(--violet);
+      color: var(--cyan);
+    }
+
+    .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); }
+    .logout-btn {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 109, 225, 0.1);
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
+    /* ──────── MAIN AREA ──────── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      padding: 0 20px;
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 11, 20, 0.4);
+    }
+
+    .top-bar-left { display: flex; align-items: center; gap: 12px; }
+    .hamburger-btn { display: none; width: 32px; height: 32px; background: transparent; border: none; color: var(--text-primary); cursor: pointer; font-size: 18px; }
+
+    .model-selector {
+      padding: 6px 12px;
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.05), rgba(0, 245, 255, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .model-selector:hover {
+      border-color: var(--violet);
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.1), rgba(0, 245, 255, 0.08));
+    }
+
+    .usage-meter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .usage-meter-bar {
+      width: 60px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .usage-meter-fill {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .usage-meter.warning .usage-meter-fill { background: var(--pink); }
+
+    .top-bar-right { display: flex; align-items: center; gap: 12px; }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .icon-btn:hover { color: var(--cyan); }
+    .icon-btn.active { color: var(--cyan); }
+
+    /* ──────── CHAT AREA ──────── */
+    #chatArea {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    #chatArea::-webkit-scrollbar {
+      width: 6px;
+    }
+    #chatArea::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #chatArea::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    #chatArea::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { justify-content: flex-end; }
+    .message.bot { justify-content: flex-start; }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      line-height: 1.6;
+      word-wrap: break-word;
+      font-size: 14px;
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.2), rgba(0, 245, 255, 0.1));
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      color: var(--text-primary);
+    }
+
+    .message.bot .message-bubble {
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(180, 109, 255, 0.05));
+      border: 1px solid rgba(180, 109, 255, 0.2);
+      color: var(--text-primary);
+    }
+
+    /* Markdown styling */
+    .message-bubble pre {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 8px 0;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    .message-bubble code {
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+    }
+    .message-bubble p { margin-bottom: 8px; }
+    .message-bubble p:last-child { margin-bottom: 0; }
+    .message-bubble ul, .message-bubble ol { margin-bottom: 8px; padding-left: 20px; }
+    .message-bubble li { margin-bottom: 4px; }
+
+    .typing-indicator {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+
+    /* ──────── INPUT AREA ──────── */
+    #inputArea {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      background: rgba(10, 11, 20, 0.4);
+      display: flex;
+      gap: 8px;
+    }
+
+    #messageInput {
+      flex: 1;
+      min-height: 40px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.05), rgba(0, 245, 255, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      resize: none;
+      max-height: 120px;
+      transition: all 0.2s ease;
+    }
+
+    #messageInput:focus {
+      outline: none;
+      border-color: var(--violet);
+      background: linear-gradient(135deg, rgba(180, 109, 255, 0.1), rgba(0, 245, 255, 0.08));
+      box-shadow: 0 0 20px rgba(182, 109, 255, 0.1);
+    }
+
+    #messageInput::placeholder {
+      color: var(--text-muted);
+    }
+
+    #sendBtn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    #sendBtn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(182, 109, 255, 0.3);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ──────── MOBILE (≤768px) ──────── */
+    @media (max-width: 768px) {
+      #sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      #sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 99;
+        transition: opacity 0.3s ease;
+      }
+
+      .sidebar-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .hamburger-btn { display: inline-flex; }
+
+      .message-bubble { max-width: 85%; }
+    }
+  </style>
+
+  <div id="workspace">
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">Luminescent</span>
+      </div>
+      <button class="new-chat-btn" id="newChatBtn">
+        <span>✨</span> New Chat
+      </button>
+      <div class="chat-list" id="chatList"></div>
+      <div class="sidebar-footer">
+        <p style="font-size: 10px; color: var(--text-muted); text-align: center;">Luminescent.io v1.0</p>
+      </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- MAIN -->
+    <div id="main">
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+          <span style="font-size:12px; color:var(--text-muted);">Gemma 4 E4B</span>
         </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-80 h-full bg-black/95 backdrop-blur-xl border-l border-white/10 z-50 p-8 md:hidden">
-            <button id="closeMobileMenu" class="absolute top-6 right-6 text-white">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div class="flex flex-col gap-6 mt-12">
-                <a href="#features" class="text-lg font-medium text-gray-300 hover:text-white">Features</a>
-                <a href="#how-it-works" class="text-lg font-medium text-gray-300 hover:text-white">How it Works</a>
-                <a href="#pricing" class="text-lg font-medium text-gray-300 hover:text-white">Pricing</a>
-                <a href="#faq" class="text-lg font-medium text-gray-300 hover:text-white">FAQ</a>
-                <hr class="border-white/10">
-                <a href="login.html" class="text-lg font-medium text-gray-300 hover:text-white">Sign In</a>
-                <a href="#pricing" class="btn-primary-premium px-6 py-3 rounded-full text-center font-semibold text-white">
-                    Start Free Trial
-                </a>
+        <div class="top-bar-right">
+          <div class="usage-meter" id="usageMeter">
+            <div class="usage-meter-bar">
+              <div class="usage-meter-fill" id="usageFill" style="width: 0%"></div>
             </div>
+            <span id="usageText">0/1000</span>
+          </div>
+          <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
         </div>
-    </nav>
+      </div>
 
-    <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <!-- Decorative Orbs -->
-        <div class="absolute top-20 left-1/4 w-96 h-96 bg-accent-purple/20 rounded-full blur-[128px] animate-pulse-slow"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-cyan/20 rounded-full blur-[128px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+      <!-- CHAT AREA -->
+      <div id="chatArea"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center max-w-4xl mx-auto">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 animate-fade-in-up">
-                    <span class="flex h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
-                    <span class="text-sm font-medium text-gray-300">New: Advanced Context Memory 2.0</span>
-                </div>
-
-                <!-- Headline -->
-                <h1 class="font-display text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in-up" style="animation-delay: 0.1s;">
-                    The AI That <span class="text-gradient">Thinks With</span><br>
-                    Your Team
-                </h1>
-
-                <!-- Subheadline -->
-                <p class="text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style="animation-delay: 0.2s;">
-                    Luminescent is a shared AI workspace that remembers context, learns your business, and helps teams collaborate at the speed of thought.
-                </p>
-
-                <!-- CTAs -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in-up" style="animation-delay: 0.3s;">
-                    <a href="#pricing" class="btn-primary-premium px-8 py-4 rounded-full text-lg font-semibold text-white btn-glow flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <span>Start 14-Day Free Trial</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                    </a>
-                    <button onclick="showDemo()" class="glass px-8 py-4 rounded-full text-lg font-medium text-white hover:bg-white/10 transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <i data-lucide="play-circle" class="w-5 h-5"></i>
-                        <span>Watch Demo</span>
-                    </button>
-                </div>
-
-                <!-- Social Proof -->
-                <div class="flex flex-col items-center gap-4 animate-fade-in-up" style="animation-delay: 0.4s;">
-                    <div class="flex -space-x-3">
-                        <img src="https://i.pravatar.cc/100?img=1" class="w-10 h-10 rounded-full border-2 border-black" alt="User">
-                        <img src="https://i.pravatar.cc/100?img=2" class="w-10 h-10 rounded-full border-2 border-black" alt="User">
-                        <img src="https://i.pravatar.cc/100?img=3" class="w-10 h-10 rounded-full border-2 border-black" alt="User">
-                        <img src="https://i.pravatar.cc/100?img=4" class="w-10 h-10 rounded-full border-2 border-black" alt="User">
-                        <div class="w-10 h-10 rounded-full border-2 border-black bg-accent-purple flex items-center justify-center text-xs font-bold">+2k</div>
-                    </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-400">
-                        <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        </div>
-                        <span>Trusted by 2,000+ teams worldwide</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hero Image/Dashboard Preview -->
-            <div class="mt-20 relative max-w-5xl mx-auto animate-fade-in-up" style="animation-delay: 0.5s;">
-                <div class="absolute -inset-1 bg-gradient-to-r from-accent-purple to-accent-cyan rounded-2xl blur opacity-30"></div>
-                <div class="relative glass-card rounded-2xl overflow-hidden border border-white/10">
-                    <div class="bg-black/40 px-4 py-3 border-b border-white/10 flex items-center gap-2">
-                        <div class="flex gap-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                        </div>
-                        <div class="flex-1 text-center text-xs text-gray-500 font-mono">Luminescent Workspace</div>
-                    </div>
-                    <div class="p-8 bg-gradient-to-b from-gray-900/50 to-black/50">
-                        <div class="flex gap-6">
-                            <!-- Sidebar -->
-                            <div class="w-64 hidden md:block space-y-4">
-                                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                                    <div class="w-8 h-8 rounded bg-accent-purple/20 flex items-center justify-center">
-                                        <i data-lucide="message-square" class="w-4 h-4 text-accent-purple"></i>
-                                    </div>
-                                    <div class="text-sm font-medium">Product Team</div>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer opacity-60">
-                                    <div class="w-8 h-8 rounded bg-accent-cyan/20 flex items-center justify-center">
-                                        <i data-lucide="code" class="w-4 h-4 text-accent-cyan"></i>
-                                    </div>
-                                    <div class="text-sm font-medium">Engineering</div>
-                                </div>
-                                <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer opacity-60">
-                                    <div class="w-8 h-8 rounded bg-pink-500/20 flex items-center justify-center">
-                                        <i data-lucide="pen-tool" class="w-4 h-4 text-pink-400"></i>
-                                    </div>
-                                    <div class="text-sm font-medium">Design</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Chat Area -->
-                            <div class="flex-1 space-y-4">
-                                <div class="flex gap-3">
-                                    <img src="https://i.pravatar.cc/100?img=5" class="w-8 h-8 rounded-full" alt="User">
-                                    <div class="glass-card p-4 rounded-2xl rounded-tl-sm max-w-lg">
-                                        <p class="text-sm text-gray-300">@Lumi analyze our Q4 metrics and suggest improvements for user retention</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 justify-end">
-                                    <div class="bg-gradient-to-r from-accent-purple/20 to-accent-cyan/20 p-4 rounded-2xl rounded-tr-sm max-w-lg border border-white/10">
-                                        <p class="text-sm text-gray-200 mb-2">Based on your Q4 data, I've identified three key opportunities:</p>
-                                        <ul class="text-sm text-gray-300 space-y-1 list-disc list-inside">
-                                            <li>Onboarding completion dropped 12% → Simplify signup flow</li>
-                                            <li>Power users increased 8% → Expand premium features</li>
-                                            <li>Mobile engagement up → Prioritize mobile optimizations</li>
-                                        </ul>
-                                        <div class="mt-3 flex gap-2">
-                                            <span class="text-xs px-2 py-1 rounded bg-white/10 text-accent-cyan">View Report</span>
-                                            <span class="text-xs px-2 py-1 rounded bg-white/10 text-accent-purple">Export PDF</span>
-                                        </div>
-                                    </div>
-                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center">
-                                        <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Logo Cloud -->
-    <section class="py-12 border-y border-white/5 overflow-hidden">
-        <div class="text-center mb-8">
-            <p class="text-sm text-gray-500 uppercase tracking-widest font-semibold">Trusted by innovative teams at</p>
-        </div>
-        <div class="relative">
-            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0a0a0f] to-transparent z-10"></div>
-            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0a0a0f] to-transparent z-10"></div>
-            <div class="logo-carousel flex gap-16 items-center whitespace-nowrap">
-                <!-- Repeat logos twice for seamless loop -->
-                <div class="flex gap-16 items-center opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
-                    <span class="text-2xl font-bold font-display">Vercel</span>
-                    <span class="text-2xl font-bold font-display">Notion</span>
-                    <span class="text-2xl font-bold font-display">Linear</span>
-                    <span class="text-2xl font-bold font-display">Figma</span>
-                    <span class="text-2xl font-bold font-display">Slack</span>
-                    <span class="text-2xl font-bold font-display">Stripe</span>
-                    <span class="text-2xl font-bold font-display">Shopify</span>
-                    <span class="text-2xl font-bold font-display">Discord</span>
-                </div>
-                <div class="flex gap-16 items-center opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all">
-                    <span class="text-2xl font-bold font-display">Vercel</span>
-                    <span class="text-2xl font-bold font-display">Notion</span>
-                    <span class="text-2xl font-bold font-display">Linear</span>
-                    <span class="text-2xl font-bold font-display">Figma</span>
-                    <span class="text-2xl font-bold font-display">Slack</span>
-                    <span class="text-2xl font-bold font-display">Stripe</span>
-                    <span class="text-2xl font-bold font-display">Shopify</span>
-                    <span class="text-2xl font-bold font-display">Discord</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-24 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Everything Your Team Needs</h2>
-                <p class="text-gray-400 text-lg max-w-2xl mx-auto">Powerful features designed to make your team exponentially more productive.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Feature 1 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="zap" class="w-7 h-7 text-accent-cyan"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Lightning Fast</h3>
-                    <p class="text-gray-400 leading-relaxed">Sub-second response times with our optimized infrastructure. No spinning loaders, just instant answers.</p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="brain" class="w-7 h-7 text-accent-purple"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Context Memory</h3>
-                    <p class="text-gray-400 leading-relaxed">Luminescent remembers every conversation, document, and decision. It learns your business, not just your prompts.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="users" class="w-7 h-7 text-pink-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Shared Workspace</h3>
-                    <p class="text-gray-400 leading-relaxed">One AI brain for your entire team. Share prompts, knowledge bases, and conversation history seamlessly.</p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="shield" class="w-7 h-7 text-green-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Enterprise Security</h3>
-                    <p class="text-gray-400 leading-relaxed">SOC 2 Type II certified, end-to-end encryption, and data residency controls. Your data never trains our models.</p>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="plug" class="w-7 h-7 text-yellow-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">50+ Integrations</h3>
-                    <p class="text-gray-400 leading-relaxed">Connect Slack, Notion, GitHub, Jira, and more. Luminescent works where your team already works.</p>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="glass-card p-8 rounded-2xl group">
-                    <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="bar-chart-3" class="w-7 h-7 text-blue-400"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-3">Usage Analytics</h3>
-                    <p class="text-gray-400 leading-relaxed">Track team productivity gains, popular prompts, and ROI metrics. See exactly how AI is helping you win.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How it Works -->
-    <section id="how-it-works" class="py-24 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-accent-purple/5 to-transparent"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Get Started in Minutes</h2>
-                <p class="text-gray-400 text-lg">From signup to productivity in three simple steps.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 relative">
-                <!-- Connection Line (Desktop) -->
-                <div class="hidden md:block absolute top-1/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent -z-10"></div>
-
-                <!-- Step 1 -->
-                <div class="text-center relative">
-                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center text-3xl font-bold font-display shadow-2xl shadow-accent-purple/20">1</div>
-                    <h3 class="text-2xl font-semibold mb-3">Create Workspace</h3>
-                    <p class="text-gray-400">Sign up and invite your team in seconds. No credit card required for the trial.</p>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="text-center relative">
-                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent-cyan to-blue-500 flex items-center justify-center text-3xl font-bold font-display shadow-2xl shadow-accent-cyan/20">2</div>
-                    <h3 class="text-2xl font-semibold mb-3">Connect Data</h3>
-                    <p class="text-gray-400">Upload documents or connect your tools. Luminescent learns your business context instantly.</p>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="text-center relative">
-                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-accent-purple flex items-center justify-center text-3xl font-bold font-display shadow-2xl shadow-blue-500/20">3</div>
-                    <h3 class="text-2xl font-semibold mb-3">Start Collaborating</h3>
-                    <p class="text-gray-400">Ask questions, generate content, and automate workflows. Watch productivity soar.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="py-20 border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <div class="text-4xl md:text-5xl font-bold font-display text-gradient-accent mb-2">10x</div>
-                    <div class="text-gray-400 text-sm uppercase tracking-wider">Faster Responses</div>
-                </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-bold font-display text-gradient-accent mb-2">2k+</div>
-                    <div class="text-gray-400 text-sm uppercase tracking-wider">Teams</div>
-                </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-bold font-display text-gradient-accent mb-2">99.9%</div>
-                    <div class="text-gray-400 text-sm uppercase tracking-wider">Uptime</div>
-                </div>
-                <div>
-                    <div class="text-4xl md:text-5xl font-bold font-display text-gradient-accent mb-2">4.9/5</div>
-                    <div class="text-gray-400 text-sm uppercase tracking-wider">User Rating</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="py-24 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Loved by Teams</h2>
-                <p class="text-gray-400 text-lg">Don't just take our word for it.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- Testimonial 1 -->
-                <div class="glass-card p-8 rounded-2xl">
-                    <div class="flex text-yellow-400 mb-4">
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                    </div>
-                    <p class="text-gray-300 mb-6 leading-relaxed">"Luminescent transformed how our product team works. We went from scattered notes to a centralized AI brain that actually understands our roadmap."</p>
-                    <div class="flex items-center gap-3">
-                        <img src="https://i.pravatar.cc/100?img=11" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <div class="font-semibold">Sarah Chen</div>
-                            <div class="text-sm text-gray-500">Head of Product, TechCorp</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 2 -->
-                <div class="glass-card p-8 rounded-2xl">
-                    <div class="flex text-yellow-400 mb-4">
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                    </div>
-                    <p class="text-gray-300 mb-6 leading-relaxed">"The context memory is a game-changer. It remembers our API docs, past decisions, and even our coding standards. It's like having a senior dev on call 24/7."</p>
-                    <div class="flex items-center gap-3">
-                        <img src="https://i.pravatar.cc/100?img=12" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <div class="font-semibold">Marcus Johnson</div>
-                            <div class="text-sm text-gray-500">CTO, StartupXYZ</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial 3 -->
-                <div class="glass-card p-8 rounded-2xl">
-                    <div class="flex text-yellow-400 mb-4">
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                    </div>
-                    <p class="text-gray-300 mb-6 leading-relaxed">"We evaluated 5 different AI tools. Luminescent won because it's actually built for teams, not individuals. The shared workspace is brilliant."</p>
-                    <div class="flex items-center gap-3">
-                        <img src="https://i.pravatar.cc/100?img=13" class="w-10 h-10 rounded-full" alt="User">
-                        <div>
-                            <div class="font-semibold">Emily Rodriguez</div>
-                            <div class="text-sm text-gray-500">VP Operations, Scale Inc</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-24 relative">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent-purple/10 rounded-full blur-[150px] -z-10"></div>
-        
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h2>
-                <p class="text-gray-400 text-lg mb-8">Start free, upgrade when you're ready. No hidden fees.</p>
-                
-                <!-- Toggle -->
-                <div class="flex items-center justify-center gap-4">
-                    <span class="text-sm font-medium text-gray-400" id="monthlyLabel">Monthly</span>
-                    <div class="relative inline-block w-14 h-8 align-middle select-none">
-                        <input type="checkbox" id="billingToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-black appearance-none cursor-pointer transition-all duration-300 left-1 top-1">
-                        <label for="billingToggle" class="toggle-label block overflow-hidden h-8 rounded-full bg-white/10 cursor-pointer border border-white/20"></label>
-                    </div>
-                    <span class="text-sm font-medium text-white" id="annualLabel">Annual <span class="text-accent-cyan text-xs">(Save 20%)</span></span>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <!-- Starter -->
-                <div class="glass-card p-8 rounded-2xl flex flex-col">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold mb-2">Starter</h3>
-                        <p class="text-gray-400 text-sm">Perfect for small teams getting started</p>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-bold font-display price-amount" data-monthly="12" data-annual="10">$12</span>
-                            <span class="text-gray-400">/month</span>
-                        </div>
-                        <div class="text-sm text-gray-500 mt-1 billing-text">Billed monthly</div>
-                    </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Up to 3 team members</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>500 AI messages/month</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>7-day conversation history</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Community support</span>
-                        </li>
-                    </ul>
-                    <button class="w-full py-3 rounded-lg border border-white/20 text-white font-semibold hover:bg-white/10 transition-all" onclick="handlePricing('starter')">
-                        Get Started
-                    </button>
-                </div>
-
-                <!-- Growth (Popular) -->
-                <div class="glass-card p-8 rounded-2xl flex flex-col relative transform md:scale-105 border-accent-purple/30 shadow-2xl shadow-accent-purple/10">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <span class="bg-gradient-to-r from-accent-purple to-accent-cyan text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Most Popular</span>
-                    </div>
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold mb-2">Growth</h3>
-                        <p class="text-gray-400 text-sm">For growing teams that need more power</p>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-bold font-display price-amount" data-monthly="21.50" data-annual="17">$21.50</span>
-                            <span class="text-gray-400">/month</span>
-                        </div>
-                        <div class="text-sm text-gray-500 mt-1 billing-text">Billed monthly</div>
-                    </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Up to 7 team members</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>2,000 AI messages/month</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>90-day conversation history</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>File & document uploads</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Slack integration</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Email support (48h)</span>
-                        </li>
-                    </ul>
-                    <button class="btn-primary-premium w-full py-3 rounded-lg text-white font-semibold btn-glow" onclick="handlePricing('growth')">
-                        Start Free Trial
-                    </button>
-                </div>
-
-                <!-- Business -->
-                <div class="glass-card p-8 rounded-2xl flex flex-col">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold mb-2">Business</h3>
-                        <p class="text-gray-400 text-sm">For organizations that need scale</p>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-bold font-display price-amount" data-monthly="30" data-annual="24">$30</span>
-                            <span class="text-gray-400">/month</span>
-                        </div>
-                        <div class="text-sm text-gray-500 mt-1 billing-text">Billed monthly</div>
-                    </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Up to 12 team members</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Unlimited AI messages</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Unlimited history + export</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>All integrations + API</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Custom branding</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-sm text-gray-300">
-                            <i data-lucide="check" class="w-5 h-5 text-accent-cyan flex-shrink-0"></i>
-                            <span>Priority support (12h)</span>
-                        </li>
-                    </ul>
-                    <button class="w-full py-3 rounded-lg border border-white/20 text-white font-semibold hover:bg-white/10 transition-all" onclick="handlePricing('business')">
-                        Contact Sales
-                    </button>
-                </div>
-            </div>
-
-            <div class="text-center mt-12 text-sm text-gray-400">
-                All plans include a <span class="text-accent-cyan font-semibold">14-day free trial</span> — No credit card required
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="py-24 border-t border-white/5">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="font-display text-4xl font-bold mb-4">Frequently Asked Questions</h2>
-                <p class="text-gray-400">Everything you need to know about Luminescent.</p>
-            </div>
-
-            <div class="space-y-4">
-                <div class="glass-card rounded-xl overflow-hidden faq-item">
-                    <button class="w-full px-6 py-4 flex items-center justify-between text-left" onclick="toggleFaq(this)">
-                        <span class="font-semibold">How does the 14-day free trial work?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 faq-icon transition-transform"></i>
-                    </button>
-                    <div class="faq-content px-6 pb-4">
-                        <p class="text-gray-400 text-sm leading-relaxed">Start with any plan absolutely free for 14 days. You get full access to all features in your chosen tier. No credit card required to start. At the end of the trial, choose to upgrade or automatically downgrade to our free tier.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-xl overflow-hidden faq-item">
-                    <button class="w-full px-6 py-4 flex items-center justify-between text-left" onclick="toggleFaq(this)">
-                        <span class="font-semibold">Can I change plans or cancel anytime?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 faq-icon transition-transform"></i>
-                    </button>
-                    <div class="faq-content px-6 pb-4">
-                        <p class="text-gray-400 text-sm leading-relaxed">Absolutely. You can upgrade, downgrade, or cancel your subscription at any time from your dashboard. If you cancel, you'll retain access until the end of your billing period.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-xl overflow-hidden faq-item">
-                    <button class="w-full px-6 py-4 flex items-center justify-between text-left" onclick="toggleFaq(this)">
-                        <span class="font-semibold">Is my data used to train AI models?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 faq-icon transition-transform"></i>
-                    </button>
-                    <div class="faq-content px-6 pb-4">
-                        <p class="text-gray-400 text-sm leading-relaxed">Never. Your data is yours alone. We have a strict zero-data-retention policy with our AI providers. Your conversations, documents, and proprietary information are never used to train models or improve our service.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-xl overflow-hidden faq-item">
-                    <button class="w-full px-6 py-4 flex items-center justify-between text-left" onclick="toggleFaq(this)">
-                        <span class="font-semibold">What integrations do you support?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 faq-icon transition-transform"></i>
-                    </button>
-                    <div class="faq-content px-6 pb-4">
-                        <p class="text-gray-400 text-sm leading-relaxed">We integrate with Slack, Microsoft Teams, Notion, Google Drive, Dropbox, GitHub, Linear, Jira, Figma, and 40+ more tools. Business plan users also get access to our REST API and webhooks.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-xl overflow-hidden faq-item">
-                    <button class="w-full px-6 py-4 flex items-center justify-between text-left" onclick="toggleFaq(this)">
-                        <span class="font-semibold">Do you offer enterprise or custom plans?</span>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 faq-icon transition-transform"></i>
-                    </button>
-                    <div class="faq-content px-6 pb-4">
-                        <p class="text-gray-400 text-sm leading-relaxed">Yes! For teams larger than 12 people or those needing SSO, advanced security, custom AI training, or dedicated support, contact our sales team for a custom enterprise quote.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="py-24 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-accent-purple/20 to-accent-cyan/20 opacity-50"></div>
-        <div class="absolute inset-0 backdrop-blur-3xl"></div>
-        
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 class="font-display text-4xl md:text-6xl font-bold mb-6">Ready to 10x Your Team?</h2>
-            <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">Join 2,000+ teams already using Luminescent to work smarter, move faster, and think bigger.</p>
-            
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="#pricing" class="btn-primary-premium px-8 py-4 rounded-full text-lg font-semibold text-white btn-glow inline-flex items-center gap-2">
-                    <span>Start Your Free Trial</span>
-                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </a>
-                <button onclick="showDemo()" class="glass px-8 py-4 rounded-full text-lg font-medium text-white hover:bg-white/10 transition-all">
-                    Schedule Demo
-                </button>
-            </div>
-            
-            <p class="mt-6 text-sm text-gray-400">No credit card required • 14-day free trial • Cancel anytime</p>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/5 pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-                <!-- Brand -->
-                <div class="col-span-2 lg:col-span-2">
-                    <a href="#" class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-accent-cyan flex items-center justify-center">
-                            <i data-lucide="zap" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <span class="font-display font-bold text-xl text-white">Luminescent.</span>
-                    </a>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-xs">
-                        The AI workspace that thinks with your team. Built for speed, security, and scale.
-                    </p>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center text-gray-400 hover:text-white hover:border-accent-purple/50 transition-all">
-                            <i data-lucide="twitter" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center text-gray-400 hover:text-white hover:border-accent-purple/50 transition-all">
-                            <i data-lucide="github" class="w-5 h-5"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center text-gray-400 hover:text-white hover:border-accent-purple/50 transition-all">
-                            <i data-lucide="linkedin" class="w-5 h-5"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Product -->
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Product</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
-                        <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Changelog</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Roadmap</a></li>
-                    </ul>
-                </div>
-
-                <!-- Company -->
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Company</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">About</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-
-                <!-- Legal -->
-                <div>
-                    <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Legal</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Privacy</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Terms</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Security</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Cookies</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-500">© 2026 Luminescent.io. All rights reserved.</p>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    All systems operational
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50 glass px-6 py-4 rounded-lg border border-white/10 shadow-2xl">
-        <div class="flex items-center gap-3">
-            <i data-lucide="info" class="w-5 h-5 text-accent-cyan"></i>
-            <span id="toastMessage" class="text-sm font-medium">Coming soon!</span>
-        </div>
+      <!-- INPUT AREA -->
+      <div id="inputArea">
+        <textarea id="messageInput" placeholder="Message Luminescent AI…" rows="1"></textarea>
+        <button id="sendBtn" disabled title="Send message">
+          <span style="font-size: 18px;">⬆️</span>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+  <script>
+    marked.setOptions({
+      highlight: (code, lang) => {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
+      },
+      langPrefix: 'hljs language-',
+      breaks: true,
+      gfm: true
+    });
 
-        // Starfield Animation
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        const numStars = 200;
+    const BYTEZ_API_KEY = 'ac81feaae1e3604a02165fd7f685a495';
+    const BYTEZ_MODEL   = 'google/gemma-4-E4B-it';
+    const SYSTEM_PROMPT = 'You are Luminescent AI, a helpful team assistant.';
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+    let currentMessages = [];
+    const messageInput  = document.getElementById('messageInput');
+    const sendBtn       = document.getElementById('sendBtn');
+    const chatArea      = document.getElementById('chatArea');
+    const hamburgerBtn  = document.getElementById('hamburgerBtn');
+    const sidebar       = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-        class Star {
-            constructor() {
-                this.reset();
-            }
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
 
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2;
-                this.speed = Math.random() * 0.5 + 0.1;
-                this.opacity = Math.random();
-                this.fadeSpeed = Math.random() * 0.02 + 0.005;
-            }
+    function addMessage(role, text) {
+      currentMessages.push({ role, text });
+      const div = document.createElement('div');
+      div.className = `message ${role}`;
+      div.innerHTML = `<div class="message-bubble">${role === 'bot' ? marked.parse(text) : escapeHtml(text)}</div>`;
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      localStorage.setItem('lum_history', JSON.stringify(currentMessages));
+    }
 
-            update() {
-                this.y -= this.speed;
-                this.opacity += this.fadeSpeed;
-                
-                if (this.opacity > 1 || this.opacity < 0) {
-                    this.fadeSpeed = -this.fadeSpeed;
-                }
-                
-                if (this.y < 0) {
-                    this.reset();
-                    this.y = canvas.height;
-                }
-            }
+    function showTypingIndicator() {
+      const div = document.createElement('div');
+      div.id = 'typing-indicator';
+      div.className = 'message bot';
+      div.innerHTML = '<div class="message-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
 
-            draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(this.opacity)})`;
-                ctx.fillRect(this.x, this.y, this.size, this.size);
-            }
-        }
+    function hideTypingIndicator() {
+      const el = document.getElementById('typing-indicator');
+      if (el) el.remove();
+    }
 
-        function initStars() {
-            stars = [];
-            for (let i = 0; i < numStars; i++) {
-                stars.push(new Star());
-            }
-        }
+    async function handleSendMessage(userText) {
+      if (!userText.trim()) return;
+      addMessage('user', userText.trim());
+      showTypingIndicator();
 
-        function animateStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(star => {
-                star.update();
-                star.draw();
-            });
-            requestAnimationFrame(animateStars);
-        }
+      const messages = currentMessages.map(m => ({
+        role: m.role === 'bot' ? 'assistant' : 'user',
+        content: m.text
+      }));
+      messages[0].content = SYSTEM_PROMPT + '\n\n' + messages[0].content;
 
-        // Initialize
-        resizeCanvas();
-        initStars();
-        animateStars();
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initStars();
+      try {
+        const res = await fetch(`https://api.bytez.com/models/v2/${BYTEZ_MODEL}`, {
+          method: 'POST',
+          headers: { 'authorization': `Key ${BYTEZ_API_KEY}`, 'content-type': 'application/json' },
+          body: JSON.stringify({ input: messages, params: { max_new_tokens: 1024 } })
         });
+        const data = await res.json();
+        hideTypingIndicator();
 
-        // Navigation Scroll Effect
-        const navbar = document.getElementById('navbar');
-        let lastScroll = 0;
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > 100) {
-                navbar.classList.add('nav-blur');
-            } else {
-                navbar.classList.remove('nav-blur');
-            }
-            
-            lastScroll = currentScroll;
-        });
-
-        // Mobile Menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const closeMobileMenu = document.getElementById('closeMobileMenu');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.add('open');
-        });
-
-        closeMobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-        });
-
-        // Close mobile menu when clicking on links
-        mobileMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('open');
-            });
-        });
-
-        // Pricing Toggle
-        const billingToggle = document.getElementById('billingToggle');
-        const priceAmounts = document.querySelectorAll('.price-amount');
-        const billingTexts = document.querySelectorAll('.billing-text');
-        const monthlyLabel = document.getElementById('monthlyLabel');
-        const annualLabel = document.getElementById('annualLabel');
-
-        billingToggle.addEventListener('change', (e) => {
-            const isAnnual = e.target.checked;
-            
-            priceAmounts.forEach(el => {
-                const price = isAnnual ? el.dataset.annual : el.dataset.monthly;
-                el.textContent = `$${price}`;
-            });
-            
-            billingTexts.forEach(el => {
-                el.textContent = isAnnual ? 'Billed annually' : 'Billed monthly';
-            });
-            
-            if (isAnnual) {
-                monthlyLabel.classList.remove('text-white');
-                monthlyLabel.classList.add('text-gray-400');
-                annualLabel.classList.remove('text-gray-400');
-                annualLabel.classList.add('text-white');
-            } else {
-                monthlyLabel.classList.remove('text-gray-400');
-                monthlyLabel.classList.add('text-white');
-                annualLabel.classList.remove('text-white');
-                annualLabel.classList.add('text-gray-400');
-            }
-        });
-
-        // FAQ Accordion
-        function toggleFaq(button) {
-            const item = button.parentElement;
-            const wasActive = item.classList.contains('active');
-            
-            // Close all
-            document.querySelectorAll('.faq-item').forEach(faq => {
-                faq.classList.remove('active');
-            });
-            
-            // Open clicked if it wasn't active
-            if (!wasActive) {
-                item.classList.add('active');
-            }
+        const output = data.output;
+        let reply = '';
+        if (output && typeof output.content === 'string') {
+          reply = output.content;
+        } else if (output && Array.isArray(output.content)) {
+          reply = output.content.map(x => x.text || '').join('');
+        } else {
+          reply = data.error || JSON.stringify(data);
         }
+        addMessage('bot', reply || 'No response.');
+      } catch (err) {
+        hideTypingIndicator();
+        addMessage('bot', `Error: ${err.message}`);
+      }
+    }
 
-        // Toast Notification
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            toastMessage.textContent = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+    messageInput.addEventListener('input', function() {
+      sendBtn.disabled = !this.value.trim();
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    messageInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (this.value.trim()) {
+          const text = this.value;
+          this.value = ''; this.style.height = 'auto'; sendBtn.disabled = true;
+          handleSendMessage(text);
         }
+      }
+    });
 
-        function handlePricing(plan) {
-            const messages = {
-                starter: 'Redirecting to Starter plan signup...',
-                growth: 'Redirecting to Growth plan signup...',
-                business: 'Redirecting to Business plan signup...'
-            };
-            showToast(messages[plan]);
-            setTimeout(() => {
-                window.location.href = `login.html?mode=register&plan=${plan}`;
-            }, 1000);
-        }
+    sendBtn.addEventListener('click', function() {
+      if (messageInput.value.trim()) {
+        const text = messageInput.value;
+        messageInput.value = ''; messageInput.style.height = 'auto'; sendBtn.disabled = true;
+        handleSendMessage(text);
+      }
+    });
 
-        function showDemo() {
-            showToast('Demo video coming soon! For now, start your free trial.');
-        }
+    hamburgerBtn.addEventListener('click', () => { sidebar.classList.add('mobile-open'); sidebarOverlay.classList.add('active'); });
+    sidebarOverlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); sidebarOverlay.classList.remove('active'); });
+    document.getElementById('settingsBtn').addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); sidebarOverlay.classList.toggle('active'); });
 
-        // GSAP Animations
-        if (typeof gsap !== 'undefined') {
-            gsap.registerPlugin(ScrollTrigger);
+    document.getElementById('newChatBtn').addEventListener('click', () => {
+      currentMessages = [];
+      localStorage.removeItem('lum_history');
+      chatArea.innerHTML = '';
+      addMessage('bot', 'New chat started. How can I help you?');
+    });
 
-            // Fade in elements on scroll
-            gsap.utils.toArray('.glass-card').forEach((card, i) => {
-                gsap.from(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    },
-                    y: 50,
-                    opacity: 0,
-                    duration: 0.6,
-                    delay: i * 0.1,
-                    ease: 'power2.out'
-                });
-            });
-
-            // Hero text animation
-            gsap.from('.animate-fade-in-up', {
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power2.out',
-                delay: 0.2
-            });
-        }
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+    // Init — restore history
+    const saved = localStorage.getItem('lum_history');
+    if (saved) {
+      try {
+        currentMessages = JSON.parse(saved);
+        currentMessages.forEach(m => {
+          const div = document.createElement('div');
+          div.className = `message ${m.role}`;
+          div.innerHTML = `<div class="message-bubble">${m.role === 'bot' ? marked.parse(m.text) : escapeHtml(m.text)}</div>`;
+          chatArea.appendChild(div);
         });
-    </script>
+        chatArea.scrollTop = chatArea.scrollHeight;
+      } catch(e) {
+        localStorage.removeItem('lum_history');
+        addMessage('bot', 'Welcome! How can I help you today?');
+      }
+    } else {
+      addMessage('bot', 'Welcome! How can I help you today?');
+    }
+  </script>
 </body>
 </html>
