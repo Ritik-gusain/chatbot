@@ -1,6 +1,6 @@
 # Luminescent.io
 
-**Team AI chatbot powered by Gemma 4.**
+**Team AI chatbot powered by Google Gemma 4.**
 
 Live: [chatbot-nine-psi-46.vercel.app](https://chatbot-nine-psi-46.vercel.app/)
 
@@ -20,12 +20,21 @@ Luminescent.io is a shared AI workspace for small teams. Every team member gets 
 
 ## Tech stack
 
-| Layer     | Technology                        |
-|-----------|-----------------------------------|
-| Frontend  | HTML + CSS + Vanilla JS           |
-| AI        | Bytez API · Google Gemma 4 E4B    |
-| Backend   | Python Streamlit (optional)       |
-| Deployment| Vercel (static)                   |
+| Layer      | Technology                     |
+|------------|--------------------------------|
+| Frontend   | HTML + CSS + Vanilla JS        |
+| AI Model   | Google Gemma 4 E4B             |
+| AI API     | Bytez (`google/gemma-4-E4B-it`)|
+| Backend    | Python + Streamlit             |
+| Deployment | Vercel (static)                |
+
+---
+
+## How it works
+
+The frontend (`index.html`) calls the **Bytez API directly from the browser** — no backend server required. The Bytez API key is embedded client-side.
+
+The Streamlit app (`backend/streamlit_app.py`) is an optional Python-based UI that does the same thing using the Bytez Python SDK.
 
 ---
 
@@ -33,21 +42,18 @@ Luminescent.io is a shared AI workspace for small teams. Every team member gets 
 
 ```
 /
-├── index.html           # Chat workspace (main app)
+├── index.html              # Main chat UI (calls Bytez API directly)
 ├── assets/
-│   ├── css/styles.css   # Global styles
+│   ├── css/styles.css      # Global styles
 │   └── js/
-│       ├── auth.js      # Auth helpers
-│       └── chat.js      # Chat placeholder
+│       ├── auth.js         # Supabase auth helpers (unused)
+│       └── chat.js         # Placeholder
 ├── api/
-│   └── chat.js          # Vercel serverless function (unused — Bytez called directly)
+│   └── chat.js             # Vercel serverless function (unused)
 ├── backend/
-│   ├── streamlit_app.py # Streamlit chat UI
-│   ├── chat_history.json
-│   └── requirements.txt
-├── keys/
-│   └── bytez_api_key.txt  # Bytez API key (gitignored)
-├── vercel.json
+│   ├── streamlit_app.py    # Streamlit chat UI (Python alternative)
+│   ├── chat_history.json   # Persisted chat history for Streamlit
+│   └── requirements.txt    # Python deps: streamlit, bytez
 └── README.md
 ```
 
@@ -55,9 +61,9 @@ Luminescent.io is a shared AI workspace for small teams. Every team member gets 
 
 ## Running locally
 
-### Web app (index.html)
+### Web app
 
-Just open `index.html` in a browser — it calls the Bytez API directly, no server needed.
+Just open `index.html` in a browser — no server needed.
 
 ### Streamlit app
 
@@ -72,7 +78,7 @@ Opens at `http://localhost:8501`
 
 ## Deployment
 
-Push to GitHub → Vercel auto-deploys. No environment variables needed (Bytez key is client-side).
+Push to GitHub → Vercel auto-deploys the static frontend.
 
 ```bash
 git push origin main
