@@ -18,7 +18,6 @@ Live: [chatbot-nine-psi-46.vercel.app](https://chatbot-nine-psi-46.vercel.app/)
 ---
 
 ## How it works
-
 The frontend (`index.html`) calls the **Bytez API directly from the browser** — no backend server required. The Bytez API key is embedded client-side.
 
 The Streamlit app (`backend/streamlit_app.py`) is an optional Python-based UI that does the same thing using the Bytez Python SDK.
